@@ -1,10 +1,9 @@
 import os
-import json
 
 import gspread
 from dotenv import load_dotenv
-from google.oauth2.service_account import Credentials
 
+from app.services.google_auth import get_google_credentials
 from app.services.google_drive import get_escape_room_images
 
 
@@ -28,62 +27,14 @@ PARTICIPANTS = [
 ]
 
 
-def get_credentials():
-    """
-    取得 Google Service Account Credentials。
-
-    本機：
-        GOOGLE_SERVICE_ACCOUNT_FILE
-
-    Render：
-        GOOGLE_SERVICE_ACCOUNT_JSON
-    """
-
-    # ========================================
-    # Render / 雲端
-    # ========================================
-
-    credentials_json = os.getenv(
-        "GOOGLE_SERVICE_ACCOUNT_JSON"
-    )
-
-    if credentials_json:
-        credentials_info = json.loads(
-            credentials_json
-        )
-
-        return Credentials.from_service_account_info(
-            credentials_info,
-            scopes=SCOPES,
-        )
-
-    # ========================================
-    # 本機
-    # ========================================
-
-    credentials_file = os.getenv(
-        "GOOGLE_SERVICE_ACCOUNT_FILE"
-    )
-
-    if not credentials_file:
-        raise RuntimeError(
-            "找不到 Google Service Account 設定。"
-            "請設定 GOOGLE_SERVICE_ACCOUNT_FILE "
-            "或 GOOGLE_SERVICE_ACCOUNT_JSON。"
-        )
-
-    return Credentials.from_service_account_file(
-        credentials_file,
-        scopes=SCOPES,
-    )
-
-
 def get_worksheet():
     """
     連線 Google Sheets
     """
 
-    credentials = get_credentials()
+    credentials = get_google_credentials(
+        SCOPES
+    )
 
     client = gspread.authorize(
         credentials
@@ -99,6 +50,7 @@ def get_worksheet():
 
     return worksheet
 
+
 def parse_bool(value):
     """
     將 Google Sheet 的 TRUE / FALSE
@@ -113,7 +65,7 @@ def parse_bool(value):
 
 def parse_int(value):
     """
-    將人數轉成 int
+    將人數轉成 int。
 
     空白欄位 → None
     """
@@ -132,21 +84,21 @@ def parse_int(value):
 def convert_escape_room(row, images):
     """
     將 Google Sheet 一列資料
-    轉換成 API 使用的格式
+    轉換成 API 使用的格式。
     """
 
-    # =========================
+    # ========================================
     # 密室名稱
-    # =========================
+    # ========================================
 
     name = str(
         row.get("密室名稱", "")
     ).strip()
 
 
-    # =========================
+    # ========================================
     # 玩家
-    # =========================
+    # ========================================
 
     participants = {
         person: parse_bool(
@@ -156,15 +108,14 @@ def convert_escape_room(row, images):
     }
 
 
-    # =========================
+    # ========================================
     # Google Drive 圖片
-    # =========================
+    # ========================================
 
     room_images = images.get(
         name,
         []
     )
-
 
     image_list = []
 
@@ -184,9 +135,9 @@ def convert_escape_room(row, images):
         )
 
 
-    # =========================
+    # ========================================
     # 回傳 API 資料
-    # =========================
+    # ========================================
 
     return {
         "id": int(row["編號"]),
@@ -197,11 +148,6 @@ def convert_escape_room(row, images):
             row.get("工作室", "")
         ).strip(),
 
-        # 多個日期使用半形逗號
-        #
-        # 例如：
-        # 2024-01-01,2025-03-15
-        #
         "date": str(
             row.get("遊玩日期", "")
         ).strip(),
@@ -220,7 +166,6 @@ def convert_escape_room(row, images):
 
         "participants": participants,
 
-        # 多張圖片
         "images": image_list,
     }
 
@@ -234,23 +179,23 @@ def get_escape_rooms():
     worksheet = get_worksheet()
 
 
-    # =========================
+    # ========================================
     # Google Sheets
-    # =========================
+    # ========================================
 
     rows = worksheet.get_all_records()
 
 
-    # =========================
+    # ========================================
     # Google Drive
-    # =========================
+    # ========================================
 
     images = get_escape_room_images()
 
 
-    # =========================
+    # ========================================
     # 整合資料
-    # =========================
+    # ========================================
 
     return [
         convert_escape_room(

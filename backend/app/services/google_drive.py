@@ -1,8 +1,9 @@
 import os
 
 from dotenv import load_dotenv
-from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
+
+from app.services.google_auth import get_google_credentials
 
 
 load_dotenv()
@@ -11,9 +12,6 @@ load_dotenv()
 SCOPES = [
     "https://www.googleapis.com/auth/drive.readonly"
 ]
-
-
-CREDENTIALS_FILE = "credentials/service-account.json"
 
 
 IMAGE_MIME_TYPES = {
@@ -29,9 +27,8 @@ GOOGLE_FOLDER_MIME_TYPE = (
 
 
 def get_drive_service():
-    credentials = Credentials.from_service_account_file(
-        CREDENTIALS_FILE,
-        scopes=SCOPES,
+    credentials = get_google_credentials(
+        SCOPES
     )
 
     return build(
@@ -44,46 +41,6 @@ def get_drive_service():
 def get_escape_room_images():
     """
     取得所有密室的圖片
-
-    Google Drive 結構：
-
-    主資料夾
-    ├── 鬼新娘/
-    │   ├── 01.jpg
-    │   └── 02.jpg
-    │
-    ├── 奪命鎖鏈/
-    │   └── 01.png
-    │
-    └── 瑪雅魔方/
-        ├── 01.jpg
-        └── 02.png
-
-
-    回傳：
-
-    {
-        "鬼新娘": [
-            {
-                "id": "...",
-                "name": "01.jpg",
-                "mime_type": "image/jpeg"
-            },
-            {
-                "id": "...",
-                "name": "02.jpg",
-                "mime_type": "image/jpeg"
-            }
-        ],
-
-        "奪命鎖鏈": [
-            {
-                "id": "...",
-                "name": "01.png",
-                "mime_type": "image/png"
-            }
-        ]
-    }
     """
 
     service = get_drive_service()
@@ -91,6 +48,11 @@ def get_escape_room_images():
     root_folder_id = os.getenv(
         "GOOGLE_DRIVE_FOLDER_ID"
     )
+
+    if not root_folder_id:
+        raise RuntimeError(
+            "找不到 GOOGLE_DRIVE_FOLDER_ID"
+        )
 
 
     # ========================================
@@ -103,14 +65,12 @@ def get_escape_room_images():
         f"and trashed = false"
     )
 
-
     folder_response = service.files().list(
         q=folder_query,
         spaces="drive",
         fields="files(id, name, mimeType)",
         orderBy="name",
     ).execute()
-
 
     folders = folder_response.get(
         "files",
@@ -141,7 +101,6 @@ def get_escape_room_images():
             f"and trashed = false"
         )
 
-
         image_response = service.files().list(
             q=image_query,
             spaces="drive",
@@ -149,14 +108,12 @@ def get_escape_room_images():
             orderBy="name",
         ).execute()
 
-
         files = image_response.get(
             "files",
             []
         )
 
 
-        # 建立該密室的圖片陣列
         images[room_name] = []
 
 
@@ -164,7 +121,6 @@ def get_escape_room_images():
 
             if file["mimeType"] not in IMAGE_MIME_TYPES:
                 continue
-
 
             images[room_name].append(
                 {
