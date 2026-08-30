@@ -1,4 +1,5 @@
 import os
+import json
 
 import gspread
 from dotenv import load_dotenv
@@ -14,8 +15,6 @@ SCOPES = [
     "https://www.googleapis.com/auth/spreadsheets.readonly"
 ]
 
-CREDENTIALS_FILE = "credentials/service-account.json"
-
 
 PARTICIPANTS = [
     "智一",
@@ -29,17 +28,66 @@ PARTICIPANTS = [
 ]
 
 
+def get_credentials():
+    """
+    取得 Google Service Account Credentials。
+
+    本機：
+        GOOGLE_SERVICE_ACCOUNT_FILE
+
+    Render：
+        GOOGLE_SERVICE_ACCOUNT_JSON
+    """
+
+    # ========================================
+    # Render / 雲端
+    # ========================================
+
+    credentials_json = os.getenv(
+        "GOOGLE_SERVICE_ACCOUNT_JSON"
+    )
+
+    if credentials_json:
+        credentials_info = json.loads(
+            credentials_json
+        )
+
+        return Credentials.from_service_account_info(
+            credentials_info,
+            scopes=SCOPES,
+        )
+
+    # ========================================
+    # 本機
+    # ========================================
+
+    credentials_file = os.getenv(
+        "GOOGLE_SERVICE_ACCOUNT_FILE"
+    )
+
+    if not credentials_file:
+        raise RuntimeError(
+            "找不到 Google Service Account 設定。"
+            "請設定 GOOGLE_SERVICE_ACCOUNT_FILE "
+            "或 GOOGLE_SERVICE_ACCOUNT_JSON。"
+        )
+
+    return Credentials.from_service_account_file(
+        credentials_file,
+        scopes=SCOPES,
+    )
+
+
 def get_worksheet():
     """
     連線 Google Sheets
     """
 
-    credentials = Credentials.from_service_account_file(
-        CREDENTIALS_FILE,
-        scopes=SCOPES,
-    )
+    credentials = get_credentials()
 
-    client = gspread.authorize(credentials)
+    client = gspread.authorize(
+        credentials
+    )
 
     spreadsheet = client.open_by_key(
         os.getenv("GOOGLE_SHEET_ID")
@@ -50,7 +98,6 @@ def get_worksheet():
     )
 
     return worksheet
-
 
 def parse_bool(value):
     """
