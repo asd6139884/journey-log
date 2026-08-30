@@ -27,10 +27,11 @@ function EscapeRoomCard({
     images[currentImageIndex];
 
 
-  const imageUrl = currentImage
-    ? `${API_BASE_URL}${currentImage.url}`
+  const imageUrl = currentImage?.url
+    ? currentImage.url.startsWith("http")
+      ? currentImage.url
+      : `${API_BASE_URL}${currentImage.url.startsWith("/") ? "" : "/"}${currentImage.url}`
     : null;
-
 
   // =========================
   // 上一張
@@ -104,6 +105,13 @@ function EscapeRoomCard({
               key={currentImage.id}
               src={imageUrl}
               alt={`${room.name} - ${currentImageIndex + 1}`}
+              onError={(e) => {
+                console.error("圖片載入失敗");
+                console.error("圖片 URL:", imageUrl);
+                console.error("圖片資料:", currentImage);
+
+                e.currentTarget.style.display = "none";
+              }}
               style={{
                 width: "100%",
                 height: "100%",
