@@ -35,6 +35,9 @@ def get_escape_room_image(file_id: str):
         return Response(
             content=file_content,
             media_type=file["mimeType"],
+            headers={
+                "Cache-Control": "public, max-age=86400",
+            },
         )
 
     except Exception:

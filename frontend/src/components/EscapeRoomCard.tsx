@@ -95,6 +95,7 @@ function EscapeRoomCard({
           width: "100%",
           height: "200px",
           backgroundColor: "#f2f2f2",
+          contain: "paint",
         }}
       >
 
@@ -105,20 +106,14 @@ function EscapeRoomCard({
               key={currentImage.id}
               src={imageUrl}
               alt={`${room.name} - ${currentImageIndex + 1}`}
-              onError={(e) => {
-                console.error("圖片載入失敗");
-                console.error("圖片 URL:", imageUrl);
-                console.error("圖片資料:", currentImage);
-
-                e.currentTarget.style.display = "none";
-              }}
+              loading="lazy"
+              decoding="async"
               style={{
                 width: "100%",
                 height: "100%",
                 objectFit: "cover",
               }}
             />
-
 
             {/* =================
                 左右切換
