@@ -14,6 +14,8 @@ import type { EscapeRoom } from "../types";
 
 import EscapeRoomCard from "../components/EscapeRoomCard";
 
+import "./EscapeRooms.css";
+
 
 const PEOPLE = [
   "智一",
@@ -69,7 +71,11 @@ function EscapeRooms() {
     const studioSet = new Set(
       rooms
         .map((room) => room.company)
-        .filter((company) => company && company.trim() !== "")
+        .filter(
+          (company) =>
+            company &&
+            company.trim() !== ""
+        )
     );
 
     return Array.from(studioSet).sort();
@@ -86,7 +92,8 @@ function EscapeRooms() {
     }
 
     return rooms.filter(
-      (room) => room.company === selectedStudio
+      (room) =>
+        room.company === selectedStudio
     );
   }, [rooms, selectedStudio]);
 
@@ -97,9 +104,11 @@ function EscapeRooms() {
 
   const playerStats = useMemo(() => {
     return PEOPLE.map((person) => {
-      const count = filteredRooms.filter(
-        (room) => room.participants?.[person] === true
-      ).length;
+      const count =
+        filteredRooms.filter(
+          (room) =>
+            room.participants?.[person] === true
+        ).length;
 
       return {
         name: person,
@@ -115,15 +124,12 @@ function EscapeRooms() {
 
   if (loading) {
     return (
-      <main
-        style={{
-          maxWidth: "1200px",
-          margin: "0 auto",
-          padding: "40px 24px",
-        }}
-      >
+      <main className="escape-page">
         <h1>密室逃脫</h1>
-        <p>載入中...</p>
+
+        <div className="status-message">
+          載入中...
+        </div>
       </main>
     );
   }
@@ -135,58 +141,42 @@ function EscapeRooms() {
 
   if (error) {
     return (
-      <main
-        style={{
-          maxWidth: "1200px",
-          margin: "0 auto",
-          padding: "40px 24px",
-        }}
-      >
+      <main className="escape-page">
         <h1>密室逃脫</h1>
 
-        <p style={{ color: "red" }}>
+        <div className="error-message">
           {error}
-        </p>
+        </div>
       </main>
     );
   }
 
 
   return (
-    <main
-      style={{
-        maxWidth: "1200px",
-        margin: "0 auto",
-        padding: "40px 24px",
-      }}
-    >
+    <main className="escape-page">
+
       {/* =========================
           標題
       ========================= */}
 
-      <h1>密室逃脫</h1>
+      <header className="escape-header">
+        <h1>密室逃脫</h1>
+
+        <p>
+          共 {filteredRooms.length} 間密室
+        </p>
+      </header>
 
 
       {/* =========================
           工作室篩選
       ========================= */}
 
-      <section
-        style={{
-          marginTop: "24px",
-          marginBottom: "40px",
-          padding: "20px",
-          border: "1px solid #ddd",
-          borderRadius: "12px",
-        }}
-      >
+      <section className="filter-section">
+
         <label
           htmlFor="studio-filter"
-          style={{
-            display: "block",
-            marginBottom: "8px",
-            fontWeight: "bold",
-          }}
+          className="filter-label"
         >
           工作室
         </label>
@@ -195,15 +185,11 @@ function EscapeRooms() {
           id="studio-filter"
           value={selectedStudio}
           onChange={(event) =>
-            setSelectedStudio(event.target.value)
+            setSelectedStudio(
+              event.target.value
+            )
           }
-          style={{
-            padding: "10px 14px",
-            borderRadius: "8px",
-            border: "1px solid #ccc",
-            minWidth: "240px",
-            fontSize: "16px",
-          }}
+          className="studio-select"
         >
           <option value="全部">
             全部工作室
@@ -218,6 +204,7 @@ function EscapeRooms() {
             </option>
           ))}
         </select>
+
       </section>
 
 
@@ -225,31 +212,33 @@ function EscapeRooms() {
           統計摘要
       ========================= */}
 
-      <section
-        style={{
-          marginBottom: "40px",
-        }}
-      >
-        <h2>遊玩統計</h2>
+      <section className="stats-section">
 
-        <p>
-          {selectedStudio === "全部"
-            ? "全部工作室"
-            : selectedStudio}
-          {"　"}
-          共 {filteredRooms.length} 個主題
-        </p>
+        <div className="section-title">
+
+          <div>
+            <h2>遊玩統計</h2>
+
+            <p>
+              {selectedStudio === "全部"
+                ? "全部工作室"
+                : selectedStudio}
+            </p>
+          </div>
+
+          <div className="room-count">
+            {filteredRooms.length} 個主題
+          </div>
+
+        </div>
 
 
-        {/* 每個人遊玩場數 */}
+        {/* =====================
+            圖表
+        ===================== */}
 
-        <div
-          style={{
-            width: "100%",
-            height: "400px",
-            marginTop: "24px",
-          }}
-        >
+        <div className="chart-container">
+
           <ResponsiveContainer
             width="100%"
             height="100%"
@@ -258,19 +247,29 @@ function EscapeRooms() {
               data={playerStats}
               margin={{
                 top: 20,
-                right: 20,
-                left: 0,
-                bottom: 20,
+                right: 10,
+                left: -10,
+                bottom: 10,
               }}
             >
-              <CartesianGrid strokeDasharray="3 3" />
+
+              <CartesianGrid
+                strokeDasharray="3 3"
+              />
 
               <XAxis
                 dataKey="name"
+                tick={{
+                  fontSize: 13,
+                }}
               />
 
               <YAxis
                 allowDecimals={false}
+                width={30}
+                tick={{
+                  fontSize: 12,
+                }}
               />
 
               <Tooltip />
@@ -279,9 +278,12 @@ function EscapeRooms() {
                 dataKey="場數"
                 name="遊玩場數"
               />
+
             </BarChart>
           </ResponsiveContainer>
+
         </div>
+
       </section>
 
 
@@ -289,107 +291,102 @@ function EscapeRooms() {
           各主題遊玩紀錄
       ========================= */}
 
-      <section
-        style={{
-          marginBottom: "50px",
-        }}
-      >
-        <h2>各主題遊玩紀錄</h2>
+      <section className="records-section">
 
-        <div
-          style={{
-            overflowX: "auto",
-            marginTop: "20px",
-            border: "1px solid #ddd",
-            borderRadius: "12px",
-          }}
-        >
-          <table
-            style={{
-              width: "100%",
-              minWidth: "900px",
-              borderCollapse: "collapse",
-            }}
-          >
+        <div className="section-title">
+
+          <div>
+            <h2>各主題遊玩紀錄</h2>
+
+            <p>
+              顯示每個人的遊玩紀錄
+            </p>
+          </div>
+
+        </div>
+
+
+        <div className="table-wrapper">
+
+          <table className="records-table">
+
             <thead>
               <tr>
-                <th
-                  style={{
-                    padding: "12px",
-                    textAlign: "left",
-                    borderBottom: "1px solid #ddd",
-                    whiteSpace: "nowrap",
-                  }}
-                >
+
+                <th className="room-name-column">
                   密室名稱
                 </th>
 
                 {PEOPLE.map((person) => (
-                  <th
-                    key={person}
-                    style={{
-                      padding: "12px",
-                      textAlign: "center",
-                      borderBottom: "1px solid #ddd",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
+                  <th key={person}>
                     {person}
                   </th>
                 ))}
+
               </tr>
             </thead>
 
+
             <tbody>
+
               {filteredRooms.map((room) => (
+
                 <tr key={room.id}>
-                  <td
-                    style={{
-                      padding: "12px",
-                      borderBottom: "1px solid #eee",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
+
+                  <td className="room-name-cell">
                     {room.name}
                   </td>
 
                   {PEOPLE.map((person) => {
+
                     const played =
                       room.participants?.[person] === true;
 
                     return (
                       <td
                         key={person}
-                        style={{
-                          padding: "12px",
-                          textAlign: "center",
-                          borderBottom: "1px solid #eee",
-                          fontSize: "20px",
-                        }}
+                        className={
+                          played
+                            ? "played-cell"
+                            : "not-played-cell"
+                        }
                       >
                         {played ? "✓" : "—"}
                       </td>
                     );
+
                   })}
+
                 </tr>
+
               ))}
 
+
               {filteredRooms.length === 0 && (
+
                 <tr>
+
                   <td
                     colSpan={PEOPLE.length + 1}
-                    style={{
-                      padding: "30px",
-                      textAlign: "center",
-                    }}
+                    className="empty-table"
                   >
                     此工作室目前沒有密室資料
                   </td>
+
                 </tr>
+
               )}
+
             </tbody>
+
           </table>
+
         </div>
+
+        <div className="table-hint">
+          ← 左右滑動查看完整紀錄 →
+        </div>
+
       </section>
 
 
@@ -397,34 +394,44 @@ function EscapeRooms() {
           密室列表
       ========================= */}
 
-      <section>
-        <h2>密室列表</h2>
+      <section className="rooms-section">
 
-        <p>
-          共 {filteredRooms.length} 間
-        </p>
+        <div className="section-title">
+
+          <div>
+            <h2>密室列表</h2>
+
+            <p>
+              共 {filteredRooms.length} 間
+            </p>
+          </div>
+
+        </div>
+
 
         {filteredRooms.length === 0 ? (
-          <p>目前沒有密室資料</p>
+
+          <div className="empty-message">
+            目前沒有密室資料
+          </div>
+
         ) : (
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns:
-                "repeat(auto-fill, minmax(260px, 1fr))",
-              gap: "24px",
-              marginTop: "24px",
-            }}
-          >
+
+          <div className="rooms-grid">
+
             {filteredRooms.map((room) => (
               <EscapeRoomCard
                 key={room.id}
                 room={room}
               />
             ))}
+
           </div>
+
         )}
+
       </section>
+
     </main>
   );
 }

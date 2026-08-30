@@ -1,0 +1,283 @@
+/* =========================
+   Card
+========================= */
+
+.escape-card {
+  overflow: hidden;
+
+  border: 1px solid #ddd;
+  border-radius: 14px;
+
+  background: #fff;
+
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.04);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+
+/* Desktop hover */
+
+@media (hover: hover) {
+
+  .escape-card:hover {
+    transform: translateY(-3px);
+
+    box-shadow:
+      0 8px 24px rgba(0, 0, 0, 0.1);
+  }
+
+}
+
+
+/* =========================
+   圖片
+========================= */
+
+.escape-card-image {
+  position: relative;
+
+  width: 100%;
+
+  aspect-ratio: 16 / 10;
+
+  background: #f2f2f2;
+
+  overflow: hidden;
+
+  contain: paint;
+}
+
+
+.escape-card-image img {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+}
+
+
+/* =========================
+   沒有圖片
+========================= */
+
+.no-image {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: 100%;
+
+  color: #888;
+
+  font-size: 14px;
+}
+
+
+/* =========================
+   圖片按鈕
+========================= */
+
+.image-button {
+  position: absolute;
+
+  top: 50%;
+
+  width: 38px;
+  height: 38px;
+
+  transform: translateY(-50%);
+
+  border: none;
+  border-radius: 50%;
+
+  background: rgba(0, 0, 0, 0.5);
+
+  color: #fff;
+
+  font-size: 26px;
+  line-height: 1;
+
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 2;
+}
+
+
+.image-button-left {
+  left: 8px;
+}
+
+
+.image-button-right {
+  right: 8px;
+}
+
+
+.image-button:active {
+  transform: translateY(-50%) scale(0.92);
+}
+
+
+/* =========================
+   圖片數量
+========================= */
+
+.image-counter {
+  position: absolute;
+
+  right: 10px;
+  bottom: 10px;
+
+  padding: 4px 8px;
+
+  border-radius: 6px;
+
+  background: rgba(0, 0, 0, 0.6);
+
+  color: #fff;
+
+  font-size: 12px;
+
+  z-index: 2;
+}
+
+
+/* =========================
+   Card 內容
+========================= */
+
+.escape-card-content {
+  padding: 18px;
+}
+
+
+.escape-card-title {
+  margin: 0 0 16px;
+
+  font-size: 20px;
+
+  line-height: 1.4;
+}
+
+
+/* =========================
+   基本資訊
+========================= */
+
+.escape-card-info {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 8px;
+}
+
+
+.escape-card-info p {
+  display: grid;
+
+  grid-template-columns: 72px 1fr;
+
+  gap: 8px;
+
+  margin: 0;
+
+  font-size: 14px;
+
+  line-height: 1.5;
+}
+
+
+.escape-card-info p span {
+  color: #777;
+
+  font-weight: 600;
+}
+
+
+/* =========================
+   玩家
+========================= */
+
+.players {
+  margin-top: 18px;
+
+  padding-top: 16px;
+
+  border-top: 1px solid #eee;
+}
+
+
+.player-list {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 6px;
+
+  margin-top: 10px;
+}
+
+
+.player-tag {
+  padding: 5px 9px;
+
+  border-radius: 6px;
+
+  background: #f0f0f0;
+
+  font-size: 13px;
+}
+
+
+/* =========================
+   Mobile
+========================= */
+
+@media (max-width: 520px) {
+
+  .escape-card-content {
+    padding: 15px;
+  }
+
+
+  .escape-card-title {
+    margin-bottom: 14px;
+
+    font-size: 18px;
+  }
+
+
+  .escape-card-info p {
+    grid-template-columns: 64px 1fr;
+
+    font-size: 14px;
+  }
+
+
+  .image-button {
+    width: 40px;
+    height: 40px;
+
+    font-size: 25px;
+  }
+
+
+  .image-counter {
+    right: 8px;
+    bottom: 8px;
+  }
+
+}
