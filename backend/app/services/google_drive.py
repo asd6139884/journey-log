@@ -18,8 +18,15 @@ IMAGE_MIME_TYPES = {
     "image/jpeg",
     "image/png",
     "image/webp",
+    "image/heic",
+    "image/heif",
 }
 
+
+def is_image_file(file):
+    mime_type = file.get("mimeType", "").lower()
+
+    return mime_type in IMAGE_MIME_TYPES
 
 GOOGLE_FOLDER_MIME_TYPE = (
     "application/vnd.google-apps.folder"
@@ -119,7 +126,7 @@ def get_escape_room_images():
 
         for file in files:
 
-            if file["mimeType"] not in IMAGE_MIME_TYPES:
+            if not is_image_file(file):
                 continue
 
             images[room_name].append(
