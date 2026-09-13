@@ -1,4 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+
+import { useNavigate } from "react-router-dom";
+
 import {
   Bar,
   BarChart,
@@ -9,13 +16,25 @@ import {
   YAxis,
 } from "recharts";
 
-import { getEscapeRooms } from "../api/escapeRooms";
+import {
+  deleteEscapeRoom,
+  getEscapeRooms,
+} from "../api/escapeRooms";
+
+import {
+  useAuth,
+} from "../auth/AuthContext";
+
 import type { EscapeRoom } from "../types";
 
 import EscapeRoomCard from "../components/EscapeRoomCard";
 
 import "./EscapeRooms.css";
 
+
+/* ==================================================
+   玩家名單
+   ================================================== */
 
 const PEOPLE = [
   "智一",
@@ -29,31 +48,76 @@ const PEOPLE = [
 ] as const;
 
 
+/* ==================================================
+   Escape Rooms
+   ================================================== */
+
 function EscapeRooms() {
-  const [rooms, setRooms] = useState<EscapeRoom[]>([]);
-  const [selectedStudio, setSelectedStudio] = useState("全部");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const navigate = useNavigate();
+
+  const {
+    hasPermission,
+  } = useAuth();
 
 
-  // =========================
-  // 取得密室資料
-  // =========================
+  /* ==================================================
+     Permission
+     ================================================== */
+
+  const canEdit =
+    hasPermission(
+      "escape_room_edit",
+    );
+
+
+  /* ==================================================
+     State
+     ================================================== */
+
+  const [rooms, setRooms] =
+    useState<EscapeRoom[]>([]);
+
+  const [selectedStudio, setSelectedStudio] =
+    useState("全部");
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [error, setError] =
+    useState("");
+
+
+  /* ==================================================
+     取得密室資料
+     ================================================== */
 
   useEffect(() => {
     async function loadRooms() {
       try {
-        console.log("開始取得密室資料");
+        console.log(
+          "開始取得密室資料",
+        );
 
-        const data = await getEscapeRooms();
+        const data =
+          await getEscapeRooms();
 
-        console.log("API 回傳：", data);
+        console.log(
+          "API 回傳：",
+          data,
+        );
 
         setRooms(data);
-      } catch (error) {
-        console.error("取得密室資料失敗：", error);
 
-        setError("無法取得密室資料");
+      } catch (err) {
+        console.error(
+          "取得密室資料失敗：",
+          err,
+        );
+
+        setError(
+          "無法取得密室資料",
+        );
+
       } finally {
         setLoading(false);
       }
@@ -63,64 +127,116 @@ function EscapeRooms() {
   }, []);
 
 
-  // =========================
-  // 工作室清單
-  // =========================
+  /* ==================================================
+     刪除密室
+     ================================================== */
+
+  async function handleDeleteRoom(
+    roomId: number,
+  ) {
+    try {
+      setError("");
+
+      await deleteEscapeRoom(
+        roomId,
+      );
+
+      setRooms(
+        (currentRooms) =>
+          currentRooms.filter(
+            (room) =>
+              room.id !== roomId,
+          ),
+      );
+
+    } catch (err) {
+      console.error(
+        "刪除密室失敗：",
+        err,
+      );
+
+      setError(
+        "刪除密室失敗",
+      );
+
+      throw err;
+    }
+  }
+
+
+  /* ==================================================
+     工作室清單
+     ================================================== */
 
   const studios = useMemo(() => {
     const studioSet = new Set(
       rooms
-        .map((room) => room.company)
+        .map(
+          (room) =>
+            room.company,
+        )
         .filter(
           (company) =>
             company &&
-            company.trim() !== ""
-        )
+            company.trim() !== "",
+        ),
     );
 
-    return Array.from(studioSet).sort();
+    return Array.from(
+      studioSet,
+    ).sort();
   }, [rooms]);
 
 
-  // =========================
-  // 根據工作室篩選
-  // =========================
+  /* ==================================================
+     篩選密室
+     ================================================== */
 
   const filteredRooms = useMemo(() => {
-    if (selectedStudio === "全部") {
+    if (
+      selectedStudio === "全部"
+    ) {
       return rooms;
     }
 
     return rooms.filter(
       (room) =>
-        room.company === selectedStudio
+        room.company ===
+        selectedStudio,
     );
-  }, [rooms, selectedStudio]);
+  }, [
+    rooms,
+    selectedStudio,
+  ]);
 
 
-  // =========================
-  // 每個人遊玩場數
-  // =========================
+  /* ==================================================
+     遊玩統計
+     ================================================== */
 
   const playerStats = useMemo(() => {
-    return PEOPLE.map((person) => {
-      const count =
-        filteredRooms.filter(
-          (room) =>
-            room.participants?.[person] === true
-        ).length;
+    return PEOPLE.map(
+      (person) => {
+        const count =
+          filteredRooms.filter(
+            (room) =>
+              room.participants?.[
+                person
+              ] === true,
+          ).length;
 
-      return {
-        name: person,
-        場數: count,
-      };
-    });
+        return {
+          name: person,
+          場數: count,
+        };
+      },
+    );
   }, [filteredRooms]);
 
 
-  // =========================
-  // Loading
-  // =========================
+  /* ==================================================
+     Loading
+     ================================================== */
 
   if (loading) {
     return (
@@ -135,9 +251,9 @@ function EscapeRooms() {
   }
 
 
-  // =========================
-  // Error
-  // =========================
+  /* ==================================================
+     Error
+     ================================================== */
 
   if (error) {
     return (
@@ -152,25 +268,31 @@ function EscapeRooms() {
   }
 
 
+  /* ==================================================
+     Render
+     ================================================== */
+
   return (
     <main className="escape-page">
 
-      {/* =========================
-          標題
-      ========================= */}
+      {/* ==================================================
+          Header
+          ================================================== */}
 
       <header className="escape-header">
-        <h1>密室逃脫</h1>
+        <div>
+          <h1>密室逃脫</h1>
 
-        <p>
-          共 {filteredRooms.length} 間密室
-        </p>
+          <p>
+            共 {filteredRooms.length} 間密室
+          </p>
+        </div>
       </header>
 
 
-      {/* =========================
+      {/* ==================================================
           工作室篩選
-      ========================= */}
+          ================================================== */}
 
       <section className="filter-section">
 
@@ -186,7 +308,7 @@ function EscapeRooms() {
           value={selectedStudio}
           onChange={(event) =>
             setSelectedStudio(
-              event.target.value
+              event.target.value,
             )
           }
           className="studio-select"
@@ -195,22 +317,24 @@ function EscapeRooms() {
             全部工作室
           </option>
 
-          {studios.map((studio) => (
-            <option
-              key={studio}
-              value={studio}
-            >
-              {studio}
-            </option>
-          ))}
+          {studios.map(
+            (studio) => (
+              <option
+                key={studio}
+                value={studio}
+              >
+                {studio}
+              </option>
+            ),
+          )}
         </select>
 
       </section>
 
 
-      {/* =========================
-          統計摘要
-      ========================= */}
+      {/* ==================================================
+          遊玩統計
+          ================================================== */}
 
       <section className="stats-section">
 
@@ -220,7 +344,8 @@ function EscapeRooms() {
             <h2>遊玩統計</h2>
 
             <p>
-              {selectedStudio === "全部"
+              {selectedStudio ===
+              "全部"
                 ? "全部工作室"
                 : selectedStudio}
             </p>
@@ -233,10 +358,6 @@ function EscapeRooms() {
         </div>
 
 
-        {/* =====================
-            圖表
-        ===================== */}
-
         <div className="chart-container">
 
           <ResponsiveContainer
@@ -247,36 +368,83 @@ function EscapeRooms() {
               data={playerStats}
               margin={{
                 top: 20,
-                right: 10,
-                left: -10,
-                bottom: 10,
+                right: 12,
+                left: -8,
+                bottom: 8,
               }}
+              barCategoryGap="24%"
             >
 
               <CartesianGrid
-                strokeDasharray="3 3"
+                vertical={false}
+                stroke="#eeeeee"
+                strokeDasharray="4 4"
               />
 
               <XAxis
                 dataKey="name"
+                axisLine={false}
+                tickLine={false}
+                tickMargin={10}
                 tick={{
                   fontSize: 13,
+                  fill: "#666",
                 }}
               />
 
               <YAxis
                 allowDecimals={false}
-                width={30}
+                width={32}
+                axisLine={false}
+                tickLine={false}
+                tickMargin={8}
                 tick={{
                   fontSize: 12,
+                  fill: "#999",
                 }}
               />
 
-              <Tooltip />
+              <Tooltip
+                cursor={{
+                  fill:
+                    "rgba(0, 0, 0, 0.03)",
+                }}
+                contentStyle={{
+                  border:
+                    "1px solid #ddd",
+                  borderRadius: "8px",
+                  background: "#fff",
+                  boxShadow:
+                    "0 4px 12px rgba(0, 0, 0, 0.08)",
+                  padding: "10px 12px",
+                }}
+                labelStyle={{
+                  marginBottom: "4px",
+                  color: "#333",
+                  fontSize: "13px",
+                  fontWeight: 600,
+                }}
+                itemStyle={{
+                  color: "#555",
+                  fontSize: "13px",
+                }}
+                formatter={(value) => [
+                  `${value ?? 0} 場`,
+                  "遊玩次數",
+                ]}
+              />
 
               <Bar
                 dataKey="場數"
-                name="遊玩場數"
+                name="遊玩次數"
+                fill="#333"
+                radius={[
+                  6,
+                  6,
+                  0,
+                  0,
+                ]}
+                maxBarSize={42}
               />
 
             </BarChart>
@@ -287,16 +455,18 @@ function EscapeRooms() {
       </section>
 
 
-      {/* =========================
+      {/* ==================================================
           各主題遊玩紀錄
-      ========================= */}
+          ================================================== */}
 
       <section className="records-section">
 
         <div className="section-title">
 
           <div>
-            <h2>各主題遊玩紀錄</h2>
+            <h2>
+              各主題遊玩紀錄
+            </h2>
 
             <p>
               顯示每個人的遊玩紀錄
@@ -317,11 +487,13 @@ function EscapeRooms() {
                   密室名稱
                 </th>
 
-                {PEOPLE.map((person) => (
-                  <th key={person}>
-                    {person}
-                  </th>
-                ))}
+                {PEOPLE.map(
+                  (person) => (
+                    <th key={person}>
+                      {person}
+                    </th>
+                  ),
+                )}
 
               </tr>
             </thead>
@@ -329,52 +501,57 @@ function EscapeRooms() {
 
             <tbody>
 
-              {filteredRooms.map((room) => (
+              {filteredRooms.map(
+                (room) => (
+                  <tr key={room.id}>
 
-                <tr key={room.id}>
+                    <td className="room-name-cell">
+                      {room.name}
+                    </td>
 
-                  <td className="room-name-cell">
-                    {room.name}
-                  </td>
+                    {PEOPLE.map(
+                      (person) => {
+                        const played =
+                          room.participants?.[
+                            person
+                          ] === true;
 
-                  {PEOPLE.map((person) => {
+                        return (
+                          <td
+                            key={person}
+                            className={
+                              played
+                                ? "played-cell"
+                                : "not-played-cell"
+                            }
+                          >
+                            {played
+                              ? "✓"
+                              : "—"}
+                          </td>
+                        );
+                      },
+                    )}
 
-                    const played =
-                      room.participants?.[person] === true;
-
-                    return (
-                      <td
-                        key={person}
-                        className={
-                          played
-                            ? "played-cell"
-                            : "not-played-cell"
-                        }
-                      >
-                        {played ? "✓" : "—"}
-                      </td>
-                    );
-
-                  })}
-
-                </tr>
-
-              ))}
+                  </tr>
+                ),
+              )}
 
 
-              {filteredRooms.length === 0 && (
-
+              {filteredRooms.length ===
+                0 && (
                 <tr>
 
                   <td
-                    colSpan={PEOPLE.length + 1}
+                    colSpan={
+                      PEOPLE.length + 1
+                    }
                     className="empty-table"
                   >
                     此工作室目前沒有密室資料
                   </td>
 
                 </tr>
-
               )}
 
             </tbody>
@@ -383,6 +560,7 @@ function EscapeRooms() {
 
         </div>
 
+
         <div className="table-hint">
           ← 左右滑動查看完整紀錄 →
         </div>
@@ -390,9 +568,9 @@ function EscapeRooms() {
       </section>
 
 
-      {/* =========================
+      {/* ==================================================
           密室列表
-      ========================= */}
+          ================================================== */}
 
       <section className="rooms-section">
 
@@ -405,6 +583,24 @@ function EscapeRooms() {
               共 {filteredRooms.length} 間
             </p>
           </div>
+
+
+          {/* ==================================
+              只有 edit 權限才顯示新增
+              ================================== */}
+
+          {canEdit && (
+            <button
+              type="button"
+              onClick={() =>
+                navigate(
+                  "/escape-rooms/new",
+                )
+              }
+            >
+              ＋ 新增密室
+            </button>
+          )}
 
         </div>
 
@@ -419,12 +615,17 @@ function EscapeRooms() {
 
           <div className="rooms-grid">
 
-            {filteredRooms.map((room) => (
-              <EscapeRoomCard
-                key={room.id}
-                room={room}
-              />
-            ))}
+            {filteredRooms.map(
+              (room) => (
+                <EscapeRoomCard
+                  key={room.id}
+                  room={room}
+                  onDelete={
+                    handleDeleteRoom
+                  }
+                />
+              ),
+            )}
 
           </div>
 
@@ -438,4 +639,3 @@ function EscapeRooms() {
 
 
 export default EscapeRooms;
-

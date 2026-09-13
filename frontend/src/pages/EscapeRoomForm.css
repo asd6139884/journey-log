@@ -1,0 +1,477 @@
+/* =========================================================
+   Escape Room Form
+   共用：CreateEscapeRoom / EditEscapeRoom
+   ========================================================= */
+
+.escape-room-form-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 32px 24px 48px;
+}
+
+.escape-room-form-page h1 {
+  margin: 0 0 28px;
+  font-size: 32px;
+  line-height: 1.3;
+}
+
+/* =========================================================
+   Error
+   ========================================================= */
+
+.escape-room-form-error {
+  margin: 0 0 24px;
+  padding: 12px 16px;
+  border: 1px solid #f1b5b5;
+  border-radius: 8px;
+  background: #fff5f5;
+  color: #c62828;
+  font-size: 14px;
+}
+
+/* =========================================================
+   基本欄位
+   ========================================================= */
+
+.escape-room-field {
+  margin-bottom: 20px;
+}
+
+.escape-room-field label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.escape-room-field input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+
+  border: 1px solid #d6d6d6;
+  border-radius: 8px;
+
+  background: #ffffff;
+  color: #222;
+
+  font-size: 15px;
+
+  outline: none;
+
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.escape-room-field input:focus {
+  border-color: #777;
+
+  box-shadow: 0 0 0 3px
+    rgba(0, 0, 0, 0.06);
+}
+
+.escape-room-field input::placeholder {
+  color: #999;
+}
+
+/* =========================================================
+   參加者
+   ========================================================= */
+
+.escape-room-participants {
+  margin-top: 32px;
+  margin-bottom: 32px;
+}
+
+.escape-room-participants h2,
+.escape-room-images-section h2 {
+  margin: 0;
+  font-size: 20px;
+  line-height: 1.4;
+}
+
+.participant-list {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 12px;
+
+  margin-top: 16px;
+}
+
+.participant-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  min-height: 44px;
+  padding: 0 12px;
+
+  border: 1px solid #dddddd;
+  border-radius: 8px;
+
+  background: #ffffff;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.participant-item:hover {
+  background: #f7f7f7;
+  border-color: #bbbbbb;
+}
+
+.participant-item input {
+  width: 16px;
+  height: 16px;
+
+  margin: 0;
+
+  cursor: pointer;
+}
+
+.participant-item span {
+  font-size: 14px;
+}
+
+/* =========================================================
+   圖片區域
+   ========================================================= */
+
+.escape-room-images-section {
+  margin-top: 36px;
+  margin-bottom: 32px;
+}
+
+.escape-room-images-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 16px;
+}
+
+.escape-room-images-header p {
+  margin: 5px 0 0;
+
+  color: #777;
+  font-size: 14px;
+}
+
+/* =========================================================
+   圖片 Grid
+   ========================================================= */
+
+.escape-room-images-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 16px;
+}
+
+/* =========================================================
+   單張圖片
+   ========================================================= */
+
+.escape-room-image-item {
+  overflow: hidden;
+
+  border: 1px solid #dddddd;
+  border-radius: 10px;
+
+  background: #ffffff;
+}
+
+.escape-room-image-preview {
+  position: relative;
+
+  width: 100%;
+
+  aspect-ratio: 4 / 3;
+
+  overflow: hidden;
+
+  background: #f2f2f2;
+}
+
+.escape-room-image-preview img {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+}
+
+.escape-room-image-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 8px;
+
+  padding: 10px 12px;
+}
+
+.escape-room-image-name {
+  min-width: 0;
+
+  overflow: hidden;
+
+  color: #444;
+
+  font-size: 13px;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* =========================================================
+   刪除圖片
+   ========================================================= */
+
+.delete-image-button {
+  flex-shrink: 0;
+
+  padding: 6px 10px;
+
+  border: 1px solid #e0b4b4;
+  border-radius: 6px;
+
+  background: #ffffff;
+  color: #c62828;
+
+  font-size: 13px;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.delete-image-button:hover:not(:disabled) {
+  background: #fff1f1;
+  border-color: #d88;
+}
+
+.delete-image-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   沒有圖片
+   ========================================================= */
+
+.no-escape-room-images {
+  padding: 32px 20px;
+
+  border: 1px dashed #cccccc;
+  border-radius: 10px;
+
+  background: #fafafa;
+
+  color: #888;
+
+  text-align: center;
+  font-size: 14px;
+}
+
+/* =========================================================
+   上傳圖片
+   ========================================================= */
+
+.upload-images-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  margin-top: 20px;
+  padding: 24px;
+
+  border: 2px dashed #cccccc;
+  border-radius: 10px;
+
+  background: #fafafa;
+}
+
+.upload-images-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 42px;
+  padding: 0 18px;
+
+  border-radius: 8px;
+
+  background: #222;
+  color: #ffffff;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    transform 0.15s ease;
+}
+
+.upload-images-button:hover {
+  background: #444;
+}
+
+.upload-images-button:active {
+  transform: translateY(1px);
+}
+
+.upload-images-box p {
+  margin: 10px 0 0;
+
+  color: #888;
+
+  font-size: 13px;
+}
+
+/* =========================================================
+   操作按鈕
+   ========================================================= */
+
+.escape-room-actions {
+  display: flex;
+  justify-content: flex-end;
+
+  gap: 12px;
+
+  margin-top: 36px;
+  padding-top: 24px;
+
+  border-top: 1px solid #eeeeee;
+}
+
+.escape-room-actions button {
+  min-width: 100px;
+  min-height: 44px;
+
+  padding: 0 18px;
+
+  border: 1px solid #cccccc;
+  border-radius: 8px;
+
+  background: #ffffff;
+  color: #333;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    opacity 0.15s ease;
+}
+
+.escape-room-actions button:hover:not(:disabled) {
+  background: #f5f5f5;
+  border-color: #aaa;
+}
+
+.escape-room-actions button[type="submit"] {
+  border-color: #222;
+
+  background: #222;
+  color: #ffffff;
+}
+
+.escape-room-actions button[type="submit"]:hover:not(:disabled) {
+  background: #444;
+}
+
+.escape-room-actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   Tablet
+   ========================================================= */
+
+@media (max-width: 768px) {
+  .escape-room-form-page {
+    padding: 24px 18px 40px;
+  }
+
+  .escape-room-form-page h1 {
+    font-size: 28px;
+    margin-bottom: 24px;
+  }
+
+  .participant-list {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .escape-room-images-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* =========================================================
+   Mobile
+   ========================================================= */
+
+@media (max-width: 480px) {
+  .escape-room-form-page {
+    padding: 20px 14px 32px;
+  }
+
+  .escape-room-form-page h1 {
+    font-size: 24px;
+  }
+
+  .escape-room-field {
+    margin-bottom: 16px;
+  }
+
+  .escape-room-field input {
+    min-height: 42px;
+  }
+
+  .participant-list {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .escape-room-images-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .escape-room-image-info {
+    padding: 9px 10px;
+  }
+
+  .upload-images-box {
+    padding: 20px 14px;
+  }
+
+  .escape-room-actions {
+    flex-direction: column-reverse;
+  }
+
+  .escape-room-actions button {
+    width: 100%;
+  }
+}

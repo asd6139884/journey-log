@@ -1,7 +1,19 @@
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import escape_rooms
+
+# =========================
+# 載入 .env
+# =========================
+
+load_dotenv()
+
+
+from app.routers import (
+    auth,
+    escape_rooms,
+)
 
 
 app = FastAPI(
@@ -32,6 +44,7 @@ app.add_middleware(
 # Routers
 # =========================
 
+app.include_router(auth.router)
 app.include_router(escape_rooms.router)
 
 

@@ -1,79 +1,154 @@
-import { useState } from "react";
+import {
+  useState,
+} from "react";
 
-import type { EscapeRoom } from "../types";
+import {
+  useNavigate,
+} from "react-router-dom";
+
+import {
+  useAuth,
+} from "../auth/AuthContext";
+
+import type {
+  EscapeRoom,
+} from "../types";
 
 import "./EscapeRoomCard.css";
 
 
 interface EscapeRoomCardProps {
   room: EscapeRoom;
+
+  onDelete: (
+    roomId: number,
+  ) => Promise<void>;
 }
-
-
-const API_BASE_URL = import.meta.env.DEV
-  ? "http://127.0.0.1:8000"
-  : "https://journey-log-331i.onrender.com";
 
 
 function EscapeRoomCard({
   room,
+  onDelete,
 }: EscapeRoomCardProps) {
+  const navigate =
+    useNavigate();
 
-  const [currentImageIndex, setCurrentImageIndex] =
-    useState(0);
+  const {
+    hasPermission,
+  } = useAuth();
 
 
-  const images = room.images ?? [];
+  /* ==================================================
+     Permission
+     ================================================== */
+
+  const canEdit =
+    hasPermission(
+      "escape_room_edit",
+    );
+
+
+  /* ==================================================
+     State
+     ================================================== */
+
+  const [
+    currentImageIndex,
+    setCurrentImageIndex,
+  ] = useState(0);
+
+  const [
+    deleting,
+    setDeleting,
+  ] = useState(false);
+
+
+  /* ==================================================
+     Images
+     ================================================== */
+
+  const images =
+    room.images ?? [];
 
   const currentImage =
-    images[currentImageIndex];
+    images[
+      currentImageIndex
+    ];
+
+  const imageUrl =
+    currentImage?.image_url ??
+    null;
 
 
-  const imageUrl = currentImage?.url
-    ? currentImage.url.startsWith("http")
-      ? currentImage.url
-      : `${API_BASE_URL}${
-          currentImage.url.startsWith("/")
-            ? ""
-            : "/"
-        }${currentImage.url}`
-    : null;
-
-
-  // =========================
-  // 上一張
-  // =========================
+  /* ==================================================
+     上一張
+     ================================================== */
 
   const handlePrevious = () => {
-
     if (images.length <= 1) {
       return;
     }
 
-    setCurrentImageIndex((index) =>
-      index === 0
-        ? images.length - 1
-        : index - 1
+    setCurrentImageIndex(
+      (index) =>
+        index === 0
+          ? images.length - 1
+          : index - 1,
     );
   };
 
 
-  // =========================
-  // 下一張
-  // =========================
+  /* ==================================================
+     下一張
+     ================================================== */
 
   const handleNext = () => {
-
     if (images.length <= 1) {
       return;
     }
 
-    setCurrentImageIndex((index) =>
-      index === images.length - 1
-        ? 0
-        : index + 1
+    setCurrentImageIndex(
+      (index) =>
+        index ===
+        images.length - 1
+          ? 0
+          : index + 1,
     );
   };
+
+
+  /* ==================================================
+     刪除
+     ================================================== */
+
+  const handleDelete =
+    async () => {
+      const confirmed =
+        window.confirm(
+          `確定要刪除「${room.name}」嗎？\n\n` +
+            "刪除後密室資料與圖片都會被刪除，無法復原。",
+        );
+
+
+      if (!confirmed) {
+        return;
+      }
+
+
+      try {
+        setDeleting(true);
+
+        await onDelete(
+          room.id,
+        );
+
+      } catch {
+        // 錯誤由父層處理
+
+      } finally {
+        setDeleting(false);
+      }
+    };
 
 
   return (
@@ -86,31 +161,37 @@ function EscapeRoomCard({
       <div className="escape-card-image">
 
         {imageUrl ? (
-
           <>
-
             <img
               key={currentImage?.id}
               src={imageUrl}
               alt={`${room.name} - ${
                 currentImageIndex + 1
               }`}
-              loading="lazy"
+              loading={
+                currentImageIndex === 0
+                  ? "eager"
+                  : "lazy"
+              }
               decoding="async"
+              fetchPriority={
+                currentImageIndex === 0
+                  ? "high"
+                  : "auto"
+              }
             />
 
 
-            {/* 左右按鈕 */}
-
             {images.length > 1 && (
-
               <>
-
                 <button
                   type="button"
-                  onClick={handlePrevious}
+                  onClick={
+                    handlePrevious
+                  }
                   aria-label="上一張圖片"
                   className="image-button image-button-left"
+                  disabled={deleting}
                 >
                   ‹
                 </button>
@@ -118,34 +199,29 @@ function EscapeRoomCard({
 
                 <button
                   type="button"
-                  onClick={handleNext}
+                  onClick={
+                    handleNext
+                  }
                   aria-label="下一張圖片"
                   className="image-button image-button-right"
+                  disabled={deleting}
                 >
                   ›
                 </button>
 
-
-                {/* 圖片數量 */}
 
                 <div className="image-counter">
                   {currentImageIndex + 1}
                   {" / "}
                   {images.length}
                 </div>
-
               </>
-
             )}
-
           </>
-
         ) : (
-
           <div className="no-image">
             暫無圖片
           </div>
-
         )}
 
       </div>
@@ -162,28 +238,37 @@ function EscapeRoomCard({
         </h2>
 
 
+        {/* =====================
+            密室資料
+        ===================== */}
+
         <div className="escape-card-info">
 
           <p>
             <span>工作室</span>
-            {room.company || "未記錄"}
+            {room.company ||
+              "未記錄"}
           </p>
 
           <p>
             <span>遊玩日期</span>
-            {room.date || "未記錄"}
+            {room.date ||
+              "未記錄"}
           </p>
 
           <p>
             <span>地點</span>
-            {room.location || "未記錄"}
+            {room.location ||
+              "未記錄"}
           </p>
 
           <p>
             <span>遊玩人數</span>
-            {room.min_players ?? "?"}
+            {room.min_players ??
+              "?"}
             {" ～ "}
-            {room.max_players ?? "?"}
+            {room.max_players ??
+              "?"}
             {" 人"}
           </p>
 
@@ -204,25 +289,65 @@ function EscapeRoomCard({
           <div className="player-list">
 
             {Object.entries(
-              room.participants ?? {}
+              room.participants ?? {},
             )
               .filter(
-                ([, played]) => played
+                ([, played]) =>
+                  played,
               )
-              .map(([name]) => (
-
-                <span
-                  key={name}
-                  className="player-tag"
-                >
-                  {name}
-                </span>
-
-              ))}
+              .map(
+                ([name]) => (
+                  <span
+                    key={name}
+                    className="player-tag"
+                  >
+                    {name}
+                  </span>
+                ),
+              )}
 
           </div>
 
         </div>
+
+
+        {/* =====================
+            操作
+            只有 edit 權限顯示
+        ===================== */}
+
+        {canEdit && (
+          <div className="escape-card-actions">
+
+            <button
+              type="button"
+              onClick={() =>
+                navigate(
+                  `/escape-rooms/${room.id}/edit`,
+                )
+              }
+              className="edit-room-button"
+              disabled={deleting}
+            >
+              編輯
+            </button>
+
+
+            <button
+              type="button"
+              onClick={
+                handleDelete
+              }
+              className="delete-room-button"
+              disabled={deleting}
+            >
+              {deleting
+                ? "刪除中..."
+                : "刪除"}
+            </button>
+
+          </div>
+        )}
 
       </div>
 

@@ -1,0 +1,355 @@
+/* ========================================
+   Journey Log Navbar
+   ======================================== */
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  width: 100%;
+
+  background: rgba(255, 255, 255, 0.92);
+  border-bottom: 1px solid #e5e7eb;
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+
+/* ========================================
+   Navbar Inner
+   ======================================== */
+
+.navbar-inner {
+  max-width: 1200px;
+  min-height: 68px;
+
+  margin: 0 auto;
+  padding: 0 24px;
+
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+
+/* ========================================
+   Brand
+   ======================================== */
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  flex-shrink: 0;
+
+  color: #111827;
+  text-decoration: none;
+
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.navbar-brand:hover {
+  opacity: 0.8;
+  transform: translateY(-1px);
+}
+
+.navbar-brand-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 34px;
+  height: 34px;
+
+  border-radius: 10px;
+
+  background: #111827;
+
+  font-size: 18px;
+}
+
+.navbar-brand-text {
+  white-space: nowrap;
+}
+
+
+/* ========================================
+   Navigation Links
+   ======================================== */
+
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  flex: 1;
+}
+
+.navbar-link {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 9px 13px;
+
+  border-radius: 9px;
+
+  color: #6b7280;
+  text-decoration: none;
+
+  font-size: 15px;
+  font-weight: 500;
+
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.navbar-link:hover {
+  color: #111827;
+  background: #f3f4f6;
+}
+
+.navbar-link.active {
+  color: #111827;
+  background: #f3f4f6;
+  font-weight: 650;
+}
+
+
+/* Active indicator */
+
+.navbar-link.active::after {
+  content: "";
+
+  position: absolute;
+
+  left: 50%;
+  bottom: 3px;
+
+  width: 5px;
+  height: 5px;
+
+  border-radius: 50%;
+
+  background: #111827;
+
+  transform: translateX(-50%);
+}
+
+
+/* ========================================
+   Auth Area
+   ======================================== */
+
+.navbar-auth {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  flex-shrink: 0;
+}
+
+
+/* ========================================
+   User Status
+   ======================================== */
+
+.navbar-user {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+
+  color: #6b7280;
+
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.navbar-user-dot {
+  width: 7px;
+  height: 7px;
+
+  border-radius: 50%;
+
+  background: #22c55e;
+
+  box-shadow: 0 0 0 3px #dcfce7;
+}
+
+
+/* ========================================
+   Login
+   ======================================== */
+
+.navbar-login {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 72px;
+  height: 38px;
+
+  padding: 0 16px;
+
+  border-radius: 9px;
+
+  color: #ffffff;
+  background: #111827;
+
+  text-decoration: none;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.navbar-login:hover {
+  background: #374151;
+
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 4px 10px rgba(0, 0, 0, 0.12);
+}
+
+
+/* ========================================
+   Logout
+   ======================================== */
+
+.navbar-logout {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 72px;
+  height: 38px;
+
+  padding: 0 16px;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 9px;
+
+  color: #374151;
+  background: #ffffff;
+
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.navbar-logout:hover {
+  color: #dc2626;
+  background: #fef2f2;
+  border-color: #fecaca;
+
+  transform: translateY(-1px);
+}
+
+.navbar-logout:active {
+  transform: translateY(0);
+}
+
+
+/* ========================================
+   Mobile
+   ======================================== */
+
+@media (max-width: 768px) {
+  .navbar-inner {
+    min-height: auto;
+
+    padding: 12px 16px;
+
+    flex-wrap: wrap;
+    gap: 10px 16px;
+  }
+
+  .navbar-brand {
+    flex: 1;
+  }
+
+  .navbar-auth {
+    order: 2;
+  }
+
+  .navbar-links {
+    order: 3;
+
+    width: 100%;
+
+    overflow-x: auto;
+
+    padding-bottom: 2px;
+
+    scrollbar-width: none;
+  }
+
+  .navbar-links::-webkit-scrollbar {
+    display: none;
+  }
+
+  .navbar-link {
+    flex-shrink: 0;
+  }
+
+  .navbar-user {
+    display: none;
+  }
+}
+
+
+/* ========================================
+   Small Mobile
+   ======================================== */
+
+@media (max-width: 480px) {
+  .navbar-brand-text {
+    font-size: 18px;
+  }
+
+  .navbar-brand-icon {
+    width: 31px;
+    height: 31px;
+
+    font-size: 16px;
+  }
+
+  .navbar-link {
+    padding: 8px 10px;
+
+    font-size: 14px;
+  }
+
+  .navbar-login,
+  .navbar-logout {
+    min-width: 64px;
+    height: 36px;
+
+    padding: 0 13px;
+  }
+}

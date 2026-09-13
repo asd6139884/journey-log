@@ -1,8 +1,10 @@
 export interface EscapeRoomImage {
-  id: string;
+  id: number;
   name: string;
-  mimeType: string;
-  url: string;
+  mime_type: string;
+  object_key: string;
+  image_url: string;
+  created_at: string;
 }
 
 
@@ -40,3 +42,19 @@ export interface EscapeRoom {
   images: EscapeRoomImage[];
 }
 
+export interface EscapeRoomInput {
+  name: string;
+
+  company: string;
+
+  // 多個日期以半形逗號分隔
+  date: string;
+
+  location: string;
+
+  min_players: number | null;
+
+  max_players: number | null;
+
+  participants: Participants;
+}

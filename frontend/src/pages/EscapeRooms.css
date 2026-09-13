@@ -1,19 +1,28 @@
-/* =========================
+/* ==================================================
+   Escape Rooms
+   密室列表頁
+   ================================================== */
+
+
+/* ==================================================
    整體頁面
-========================= */
+   ================================================== */
 
 .escape-page {
   width: 100%;
   max-width: 1200px;
+
   margin: 0 auto;
-  padding: 40px 24px 60px;
+
+  padding: 32px 24px 48px;
+
   box-sizing: border-box;
 }
 
 
-/* =========================
+/* ==================================================
    Header
-========================= */
+   ================================================== */
 
 .escape-header {
   margin-bottom: 28px;
@@ -21,154 +30,251 @@
 
 .escape-header h1 {
   margin: 0;
+
   font-size: 32px;
+  line-height: 1.3;
 }
 
 .escape-header p {
   margin: 8px 0 0;
-  color: #666;
+
+  color: #777;
+
+  font-size: 14px;
 }
 
 
-/* =========================
+/* ==================================================
    Section
-========================= */
+   ================================================== */
 
 .filter-section,
 .stats-section,
 .records-section,
 .rooms-section {
-  margin-bottom: 40px;
+  margin-bottom: 36px;
 }
 
 
-/* =========================
+/* ==================================================
    工作室篩選
-========================= */
+   ================================================== */
 
 .filter-section {
   padding: 20px;
+
   border: 1px solid #ddd;
-  border-radius: 12px;
+  border-radius: 10px;
+
   background: #fff;
 }
 
 .filter-label {
   display: block;
+
   margin-bottom: 8px;
-  font-weight: 700;
+
+  font-size: 15px;
+  font-weight: 600;
 }
 
 .studio-select {
+  box-sizing: border-box;
+
   width: 100%;
   max-width: 320px;
-  min-height: 46px;
-  padding: 10px 14px;
-  border: 1px solid #ccc;
+
+  min-height: 44px;
+
+  padding: 10px 12px;
+
+  border: 1px solid #d6d6d6;
   border-radius: 8px;
+
   background: #fff;
-  font-size: 16px;
-  box-sizing: border-box;
+  color: #222;
+
+  font-size: 15px;
+
+  outline: none;
+
+  cursor: pointer;
+
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.studio-select:focus {
+  border-color: #777;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(0, 0, 0, 0.06);
 }
 
 
-/* =========================
+/* ==================================================
    Section 標題
-========================= */
+   ================================================== */
 
 .section-title {
   display: flex;
+
   align-items: center;
   justify-content: space-between;
+
   gap: 20px;
+
   margin-bottom: 20px;
 }
 
 .section-title h2 {
   margin: 0;
-  font-size: 24px;
+
+  font-size: 20px;
+  line-height: 1.4;
 }
 
 .section-title p {
   margin: 6px 0 0;
-  color: #666;
-}
 
-.room-count {
-  padding: 8px 14px;
-  border-radius: 20px;
-  background: #f2f2f2;
-  white-space: nowrap;
+  color: #777;
+
   font-size: 14px;
 }
 
+.room-count {
+  flex-shrink: 0;
 
-/* =========================
-   圖表
-========================= */
+  padding: 6px 12px;
 
-.chart-container {
-  width: 100%;
-  height: 400px;
-  padding: 10px;
-  box-sizing: border-box;
-  border: 1px solid #eee;
-  border-radius: 12px;
-  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 20px;
+
+  background: #f7f7f7;
+  color: #555;
+
+  font-size: 13px;
+
+  white-space: nowrap;
 }
 
 
-/* =========================
+/* ==================================================
+   統計區
+   ================================================== */
+
+.stats-section {
+  margin-top: 8px;
+}
+
+
+/* ==================================================
+   圖表
+   ================================================== */
+
+.chart-container {
+  width: 100%;
+
+  height: 360px;
+
+  padding: 18px 18px 12px;
+
+  box-sizing: border-box;
+
+  border: 1px solid #ddd;
+  border-radius: 10px;
+
+  background: #fff;
+
+  overflow: hidden;
+}
+
+
+/* ==================================================
    表格
-========================= */
+   ================================================== */
 
 .table-wrapper {
   width: 100%;
+
   overflow-x: auto;
+
   -webkit-overflow-scrolling: touch;
+
   border: 1px solid #ddd;
-  border-radius: 12px;
+  border-radius: 10px;
+
   background: #fff;
 }
 
 .records-table {
   width: 100%;
+
   min-width: 850px;
+
   border-collapse: collapse;
 }
 
 .records-table th {
   padding: 12px;
-  text-align: center;
-  white-space: nowrap;
+
   border-bottom: 1px solid #ddd;
+
   background: #fafafa;
-  font-size: 14px;
+
+  color: #444;
+
+  text-align: center;
+
+  white-space: nowrap;
+
+  font-size: 13px;
+  font-weight: 600;
 }
 
 .records-table td {
   padding: 12px;
-  text-align: center;
-  white-space: nowrap;
+
   border-bottom: 1px solid #eee;
+
+  text-align: center;
+
+  white-space: nowrap;
+
+  font-size: 14px;
 }
 
 .records-table tr:last-child td {
   border-bottom: none;
 }
 
+
+/* ==================================================
+   表格：密室名稱
+   ================================================== */
+
 .room-name-column {
   width: 240px;
+
   text-align: left !important;
 }
 
 .room-name-cell {
   text-align: left !important;
+
   font-weight: 500;
 }
 
+
+/* ==================================================
+   表格：遊玩狀態
+   ================================================== */
+
 .played-cell {
-  font-size: 20px;
+  font-size: 18px;
+
   font-weight: 700;
 }
 
@@ -176,80 +282,169 @@
   color: #aaa;
 }
 
+
+/* ==================================================
+   表格：沒有資料
+   ================================================== */
+
 .empty-table {
-  padding: 30px !important;
-  color: #777;
+  padding: 32px 20px !important;
+
+  color: #888;
+
+  text-align: center !important;
+
+  font-size: 14px;
 }
 
 
-/* =========================
-   手機提示
-========================= */
+/* ==================================================
+   手機滑動提示
+   ================================================== */
 
 .table-hint {
   display: none;
+
   margin-top: 8px;
+
   color: #888;
+
   text-align: center;
+
   font-size: 13px;
 }
 
 
-/* =========================
+/* ==================================================
    密室 Grid
-========================= */
+   ================================================== */
 
 .rooms-grid {
   display: grid;
-  grid-template-columns: repeat(
-    auto-fill,
-    minmax(260px, 1fr)
-  );
-  gap: 24px;
+
+  grid-template-columns:
+    repeat(
+      auto-fill,
+      minmax(260px, 1fr)
+    );
+
+  gap: 20px;
 }
 
 
-/* =========================
+/* ==================================================
    Loading / Error
-========================= */
+   ================================================== */
 
 .status-message,
 .error-message {
-  padding: 30px;
+  padding: 32px 20px;
+
+  border: 1px solid #ddd;
+  border-radius: 10px;
+
+  background: #fff;
+
   text-align: center;
+
+  font-size: 14px;
+}
+
+.status-message {
+  color: #777;
 }
 
 .error-message {
-  color: #d00;
+  border-color: #f1b5b5;
+
+  background: #fff5f5;
+
+  color: #c62828;
 }
 
 
-/* =========================
+/* ==================================================
    Empty
-========================= */
+   ================================================== */
 
 .empty-message {
-  padding: 40px;
-  border: 1px solid #ddd;
-  border-radius: 12px;
+  padding: 40px 20px;
+
+  border: 1px dashed #ccc;
+  border-radius: 10px;
+
+  background: #fafafa;
+
+  color: #888;
+
   text-align: center;
-  color: #777;
+
+  font-size: 14px;
+}
+
+
+/* ==================================================
+   新增密室按鈕
+   ================================================== */
+
+.rooms-section .section-title button {
+  flex-shrink: 0;
+
+  min-height: 42px;
+
+  padding: 0 16px;
+
+  border: 1px solid #222;
+  border-radius: 8px;
+
+  background: #222;
+
+  color: #fff;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.1s ease;
+}
+
+.rooms-section .section-title button:hover {
+  background: #444;
+
+  border-color: #444;
+}
+
+.rooms-section .section-title button:active {
+  transform: translateY(1px);
 }
 
 
 /* ==================================================
    Tablet
-================================================== */
+   ================================================== */
 
 @media (max-width: 768px) {
-
   .escape-page {
-    padding: 28px 16px 50px;
+    padding: 24px 18px 40px;
+  }
+
+
+  /* Header */
+
+  .escape-header {
+    margin-bottom: 24px;
   }
 
   .escape-header h1 {
     font-size: 28px;
   }
+
+
+  /* Filter */
 
   .filter-section {
     padding: 16px;
@@ -259,37 +454,52 @@
     max-width: none;
   }
 
+
+  /* Chart */
+
   .chart-container {
     height: 320px;
+
+    padding:
+      14px 10px 8px;
   }
+
+
+  /* Section */
 
   .section-title {
     align-items: flex-start;
   }
 
+
+  /* Rooms */
+
   .rooms-grid {
-    grid-template-columns: repeat(
-      2,
-      minmax(0, 1fr)
-    );
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+
     gap: 16px;
   }
+
+
+  /* Table */
 
   .table-hint {
     display: block;
   }
-
 }
 
 
 /* ==================================================
    Mobile
-================================================== */
+   ================================================== */
 
 @media (max-width: 520px) {
-
   .escape-page {
-    padding: 20px 12px 40px;
+    padding: 20px 14px 32px;
   }
 
 
@@ -300,7 +510,11 @@
   }
 
   .escape-header h1 {
-    font-size: 26px;
+    font-size: 24px;
+  }
+
+  .escape-header p {
+    font-size: 13px;
   }
 
 
@@ -314,23 +528,35 @@
   }
 
 
-  /* 標題 */
+  /* Section 標題 */
 
   .section-title {
     display: block;
   }
 
   .section-title h2 {
-    font-size: 21px;
+    font-size: 20px;
   }
 
   .section-title p {
-    font-size: 14px;
+    font-size: 13px;
   }
 
   .room-count {
     display: inline-block;
+
     margin-top: 10px;
+  }
+
+
+  /* 新增按鈕 */
+
+  .rooms-section
+    .section-title
+    button {
+    width: 100%;
+
+    margin-top: 14px;
   }
 
 
@@ -338,7 +564,9 @@
 
   .chart-container {
     height: 280px;
-    padding: 4px;
+
+    padding:
+      10px 4px 6px;
   }
 
 
@@ -358,7 +586,19 @@
 
   .rooms-grid {
     grid-template-columns: 1fr;
+
     gap: 16px;
   }
+}
 
+
+/* ==================================================
+   Small Mobile
+   ================================================== */
+
+@media (max-width: 360px) {
+  .escape-page {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
 }
