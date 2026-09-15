@@ -35,6 +35,9 @@ class EscapeRoom(BaseModel):
     # 工作室 ID
     studio_id: int | None = None
 
+    # 工作室名稱
+    studio_name: str | None = None
+
     # 一個密室可以有多個日期
     #
     # 例如：
@@ -51,6 +54,9 @@ class EscapeRoom(BaseModel):
     # 地點 ID
     location_id: int | None = None
 
+    # 地點名稱
+    location_name: str | None = None
+    
     min_people: int | None = None
 
     max_people: int | None = None
