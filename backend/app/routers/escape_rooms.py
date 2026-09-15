@@ -97,11 +97,11 @@ def create_escape_room(
 ):
     room = EscapeRoomModel(
         name=data.name,
-        studio=data.company,
-        dates=data.date,
-        location=data.location,
-        min_people=data.min_players,
-        max_people=data.max_players,
+        studio_id=data.studio_id,
+        dates=data.dates,
+        location_id=data.location_id,
+        min_people=data.min_people,
+        max_people=data.max_people,
 
         chih_yi=data.participants.get(
             "智一",
@@ -248,12 +248,20 @@ def update_escape_room(
             detail="Escape room not found",
         )
 
+    # ========================================
+    # Basic information
+    # ========================================
+
     room.name = data.name
-    room.studio = data.company
-    room.dates = data.date
-    room.location = data.location
-    room.min_people = data.min_players
-    room.max_people = data.max_players
+    room.studio_id = data.studio_id
+    room.dates = data.dates
+    room.location_id = data.location_id
+    room.min_people = data.min_people
+    room.max_people = data.max_people
+
+    # ========================================
+    # Participants
+    # ========================================
 
     participants = data.participants
 
@@ -297,6 +305,10 @@ def update_escape_room(
         False,
     )
 
+    # ========================================
+    # Save
+    # ========================================
+
     try:
         db.commit()
         db.refresh(room)
@@ -312,6 +324,10 @@ def update_escape_room(
             status_code=500,
             detail="Failed to update escape room",
         )
+    
+    # ========================================
+    # Return updated room
+    # ========================================
 
     updated_room = get_escape_room(
         db,

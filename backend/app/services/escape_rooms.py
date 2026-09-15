@@ -3,7 +3,12 @@ import os
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.models import EscapeRoom, EscapeRoomImage
+from app.models import (
+    EscapeRoom,
+    EscapeRoomImage,
+    Studio,
+    Location,
+)
 
 
 # ========================================
@@ -52,6 +57,8 @@ def build_image_url(
 def _build_room_response(
     room: EscapeRoom,
     room_images: list[EscapeRoomImage],
+    studio: Studio | None = None,
+    location: Location | None = None,
 ) -> dict:
     # ====================================
     # 參加者
@@ -94,12 +101,34 @@ def _build_room_response(
     return {
         "id": room.id,
         "name": room.name,
-        "company": room.studio or "",
-        "date": room.dates or "",
-        "location": room.location or "",
-        "min_players": room.min_people,
-        "max_players": room.max_people,
+
+        # 工作室
+        "studio_id": room.studio_id,
+        "studio_name": (
+            studio.name
+            if studio is not None
+            else None
+        ),
+
+        # 多個日期
+        "dates": room.dates or [],
+
+        # 地點
+        "location_id": room.location_id,
+        "location_name": (
+            location.name
+            if location is not None
+            else None
+        ),
+
+        # 人數
+        "min_people": room.min_people,
+        "max_people": room.max_people,
+
+        # 參加者
         "participants": participants,
+
+        # 圖片
         "images": image_list,
     }
 
@@ -113,14 +142,34 @@ def get_escape_rooms(
 ) -> list[dict]:
     # ====================================
     # 取得所有密室
+    #
+    # EscapeRoom
+    #   ↓ studio_id
+    # Studio
+    #
+    # EscapeRoom
+    #   ↓ location_id
+    # Location
     # ====================================
 
     stmt = (
-        select(EscapeRoom)
+        select(
+            EscapeRoom,
+            Studio,
+            Location,
+        )
+        .outerjoin(
+            Studio,
+            EscapeRoom.studio_id == Studio.id,
+        )
+        .outerjoin(
+            Location,
+            EscapeRoom.location_id == Location.id,
+        )
         .order_by(EscapeRoom.id)
     )
 
-    rooms = db.scalars(stmt).all()
+    rows = db.execute(stmt).all()
 
     # ====================================
     # 取得所有圖片
@@ -137,7 +186,10 @@ def get_escape_rooms(
     # 建立圖片索引
     # ====================================
 
-    images_by_room: dict[int, list[EscapeRoomImage]] = {}
+    images_by_room: dict[
+        int,
+        list[EscapeRoomImage],
+    ] = {}
 
     for image in images:
         images_by_room.setdefault(
@@ -151,7 +203,7 @@ def get_escape_rooms(
 
     result = []
 
-    for room in rooms:
+    for room, studio, location in rows:
         room_images = images_by_room.get(
             room.id,
             [],
@@ -161,6 +213,8 @@ def get_escape_rooms(
             _build_room_response(
                 room,
                 room_images,
+                studio,
+                location,
             )
         )
 
@@ -176,20 +230,34 @@ def get_escape_room(
     escape_room_id: int,
 ) -> dict | None:
     # ====================================
-    # 找密室
+    # 找密室 + 工作室 + 地點
     # ====================================
 
     stmt = (
-        select(EscapeRoom)
+        select(
+            EscapeRoom,
+            Studio,
+            Location,
+        )
+        .outerjoin(
+            Studio,
+            EscapeRoom.studio_id == Studio.id,
+        )
+        .outerjoin(
+            Location,
+            EscapeRoom.location_id == Location.id,
+        )
         .where(
             EscapeRoom.id == escape_room_id
         )
     )
 
-    room = db.scalars(stmt).first()
+    row = db.execute(stmt).first()
 
-    if room is None:
+    if row is None:
         return None
+
+    room, studio, location = row
 
     # ====================================
     # 取得這間密室的圖片
@@ -213,4 +281,6 @@ def get_escape_room(
     return _build_room_response(
         room,
         images,
+        studio,
+        location,
     )

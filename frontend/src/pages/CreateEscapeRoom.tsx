@@ -12,9 +12,21 @@ import {
   uploadEscapeRoomImage,
 } from "../api/escapeRooms";
 
+import {
+  getStudios,
+  createStudio,
+} from "../api/studios";
+
+import {
+  getLocations,
+  createLocation,
+} from "../api/locations";
+
 import type {
   EscapeRoomInput,
   Participants,
+  Studio,
+  Location,
 } from "../types";
 
 import "./EscapeRoomForm.css";
@@ -59,14 +71,67 @@ function CreateEscapeRoom() {
   const [form, setForm] =
     useState<EscapeRoomInput>({
       name: "",
-      company: "",
-      date: "",
-      location: "",
-      min_players: null,
-      max_players: null,
+      studio_id: null,
+      dates: [],
+      location_id: null,
+      min_people: null,
+      max_people: null,
       participants:
         initialParticipants,
     });
+
+
+  /*
+   * 工作室列表
+   */
+  const [studios, setStudios] =
+    useState<Studio[]>([]);
+
+
+  /*
+   * 地點列表
+   */
+  const [locations, setLocations] =
+    useState<Location[]>([]);
+
+
+  /*
+   * 新增工作室時使用的文字。
+   */
+  const [newStudioName, setNewStudioName] =
+    useState("");
+
+
+  /*
+   * 新增地點時使用的文字。
+   */
+  const [newLocationName, setNewLocationName] =
+    useState("");
+
+
+  /*
+   * 是否顯示新增工作室輸入框。
+   */
+  const [showNewStudio, setShowNewStudio] =
+    useState(false);
+
+
+  /*
+   * 是否顯示新增地點輸入框。
+   */
+  const [showNewLocation, setShowNewLocation] =
+    useState(false);
+
+
+  /*
+   * 目前正在日期輸入框中選擇的日期。
+   *
+   * 注意：
+   * dates 才是真正要送到 API 的日期陣列。
+   * dateInput 只是暫存目前選擇的日期。
+   */
+  const [dateInput, setDateInput] =
+    useState("");
 
 
   const [images, setImages] =
@@ -83,6 +148,44 @@ function CreateEscapeRoom() {
 
   const [error, setError] =
     useState<string | null>(null);
+
+
+  /* ==================================================
+     載入工作室 / 地點
+     ================================================== */
+
+  useEffect(() => {
+    async function loadOptions() {
+      try {
+        const [
+          studioData,
+          locationData,
+        ] = await Promise.all([
+          getStudios(),
+          getLocations(),
+        ]);
+
+        setStudios(studioData);
+        setLocations(locationData);
+
+      } catch (err) {
+        if (
+          err instanceof Error
+        ) {
+          setError(
+            err.message,
+          );
+        } else {
+          setError(
+            "取得工作室與地點列表失敗",
+          );
+        }
+      }
+    }
+
+
+    loadOptions();
+  }, []);
 
 
   /* ==================================================
@@ -127,6 +230,67 @@ function CreateEscapeRoom() {
 
 
   /* ==================================================
+     新增日期
+     ================================================== */
+
+  function handleAddDate() {
+    if (!dateInput) {
+      return;
+    }
+
+
+    /*
+     * 避免同一個日期重複加入。
+     */
+    if (
+      form.dates.includes(
+        dateInput,
+      )
+    ) {
+      setDateInput("");
+
+      return;
+    }
+
+
+    setForm(
+      (currentForm) => ({
+        ...currentForm,
+
+        dates: [
+          ...currentForm.dates,
+          dateInput,
+        ].sort(),
+      }),
+    );
+
+
+    setDateInput("");
+  }
+
+
+  /* ==================================================
+     移除日期
+     ================================================== */
+
+  function handleRemoveDate(
+    date: string,
+  ) {
+    setForm(
+      (currentForm) => ({
+        ...currentForm,
+
+        dates:
+          currentForm.dates.filter(
+            (currentDate) =>
+              currentDate !== date,
+          ),
+      }),
+    );
+  }
+
+
+  /* ==================================================
      更新參加者
      ================================================== */
 
@@ -145,6 +309,141 @@ function CreateEscapeRoom() {
         },
       }),
     );
+  }
+
+
+  /* ==================================================
+     新增工作室
+     ================================================== */
+
+  async function handleCreateStudio() {
+    const name =
+      newStudioName.trim();
+
+
+    if (!name) {
+      return;
+    }
+
+
+    try {
+      const studio =
+        await createStudio(
+          name,
+        );
+
+
+      /*
+       * 加入目前列表。
+       */
+      setStudios(
+        (currentStudios) => [
+          ...currentStudios,
+          studio,
+        ].sort(
+          (a, b) =>
+            a.name.localeCompare(
+              b.name,
+            ),
+        ),
+      );
+
+
+      /*
+       * 自動選取剛新增的工作室。
+       */
+      setForm(
+        (currentForm) => ({
+          ...currentForm,
+          studio_id: studio.id,
+        }),
+      );
+
+
+      setNewStudioName("");
+      setShowNewStudio(false);
+
+    } catch (err) {
+      if (
+        err instanceof Error
+      ) {
+        setError(
+          err.message,
+        );
+      } else {
+        setError(
+          "新增工作室失敗",
+        );
+      }
+    }
+  }
+
+
+  /* ==================================================
+     新增地點
+     ================================================== */
+
+  async function handleCreateLocation() {
+    const name =
+      newLocationName.trim();
+
+
+    if (!name) {
+      return;
+    }
+
+
+    try {
+      const location =
+        await createLocation(
+          name,
+        );
+
+
+      /*
+       * 加入目前列表。
+       */
+      setLocations(
+        (currentLocations) => [
+          ...currentLocations,
+          location,
+        ].sort(
+          (a, b) =>
+            a.name.localeCompare(
+              b.name,
+            ),
+        ),
+      );
+
+
+      /*
+       * 自動選取剛新增的地點。
+       */
+      setForm(
+        (currentForm) => ({
+          ...currentForm,
+          location_id:
+            location.id,
+        }),
+      );
+
+
+      setNewLocationName("");
+      setShowNewLocation(false);
+
+    } catch (err) {
+      if (
+        err instanceof Error
+      ) {
+        setError(
+          err.message,
+        );
+      } else {
+        setError(
+          "新增地點失敗",
+        );
+      }
+    }
   }
 
 
@@ -219,12 +518,12 @@ function CreateEscapeRoom() {
 
 
     if (
-      form.min_players !==
+      form.min_people !==
         null &&
-      form.max_players !==
+      form.max_people !==
         null &&
-      form.min_players >
-        form.max_players
+      form.min_people >
+        form.max_people
     ) {
       setError(
         "最少人數不能大於最多人數",
@@ -335,29 +634,115 @@ function CreateEscapeRoom() {
         </div>
 
 
+        {/* =========================
+            工作室
+        ========================= */}
+
         <div className="escape-room-field">
 
-          <label htmlFor="company">
+          <label htmlFor="studio">
             工作室
           </label>
 
-          <input
-            id="company"
-            type="text"
+          <select
+            id="studio"
             value={
-              form.company
+              form.studio_id ?? ""
             }
-            placeholder="例如：草咩咩遊戲工作室"
             onChange={(event) =>
-              updateField(
-                "company",
-                event.target.value,
+              setForm(
+                (currentForm) => ({
+                  ...currentForm,
+                  studio_id:
+                    event.target.value
+                      ? Number(
+                          event.target.value,
+                        )
+                      : null,
+                }),
               )
             }
-          />
+          >
+
+            <option value="">
+              請選擇工作室
+            </option>
+
+            {studios.map(
+              (studio) => (
+                <option
+                  key={studio.id}
+                  value={studio.id}
+                >
+                  {studio.name}
+                </option>
+              ),
+            )}
+
+          </select>
+
+
+          {!showNewStudio ? (
+
+            <button
+              type="button"
+              onClick={() =>
+                setShowNewStudio(true)
+              }
+            >
+              ＋ 新增工作室
+            </button>
+
+          ) : (
+
+            <div
+              style={{
+                display: "flex",
+                gap: "8px",
+                marginTop: "8px",
+              }}
+            >
+
+              <input
+                type="text"
+                value={newStudioName}
+                placeholder="輸入新工作室名稱"
+                onChange={(event) =>
+                  setNewStudioName(
+                    event.target.value,
+                  )
+                }
+              />
+
+              <button
+                type="button"
+                onClick={
+                  handleCreateStudio
+                }
+              >
+                新增
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setNewStudioName("");
+                  setShowNewStudio(false);
+                }}
+              >
+                取消
+              </button>
+
+            </div>
+
+          )}
 
         </div>
 
+
+        {/* =========================
+            日期
+        ========================= */}
 
         <div className="escape-room-field">
 
@@ -365,21 +750,92 @@ function CreateEscapeRoom() {
             日期
           </label>
 
-          <input
-            id="date"
-            type="text"
-            value={form.date}
-            placeholder="例如：2026.07.25"
-            onChange={(event) =>
-              updateField(
-                "date",
-                event.target.value,
-              )
-            }
-          />
+
+          <div
+            style={{
+              display: "flex",
+              gap: "8px",
+            }}
+          >
+
+            <input
+              id="date"
+              type="date"
+              value={dateInput}
+              onChange={(event) =>
+                setDateInput(
+                  event.target.value,
+                )
+              }
+            />
+
+
+            <button
+              type="button"
+              onClick={
+                handleAddDate
+              }
+            >
+              新增日期
+            </button>
+
+          </div>
+
+
+          {form.dates.length > 0 && (
+
+            <div
+              style={{
+                marginTop: "12px",
+                display: "flex",
+                flexWrap: "wrap",
+                gap: "8px",
+              }}
+            >
+
+              {form.dates.map(
+                (date) => (
+
+                  <div
+                    key={date}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                    }}
+                  >
+
+                    <span>
+                      {date}
+                    </span>
+
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleRemoveDate(
+                          date,
+                        )
+                      }
+                    >
+                      移除
+                    </button>
+
+                  </div>
+
+                ),
+              )}
+
+            </div>
+
+          )}
 
         </div>
 
+
+        {/* =========================
+            地點
+        ========================= */}
 
         <div className="escape-room-field">
 
@@ -387,20 +843,98 @@ function CreateEscapeRoom() {
             地點
           </label>
 
-          <input
+          <select
             id="location"
-            type="text"
             value={
-              form.location
+              form.location_id ?? ""
             }
-            placeholder="例如：台中"
             onChange={(event) =>
-              updateField(
-                "location",
-                event.target.value,
+              setForm(
+                (currentForm) => ({
+                  ...currentForm,
+                  location_id:
+                    event.target.value
+                      ? Number(
+                          event.target.value,
+                        )
+                      : null,
+                }),
               )
             }
-          />
+          >
+
+            <option value="">
+              請選擇地點
+            </option>
+
+            {locations.map(
+              (location) => (
+                <option
+                  key={location.id}
+                  value={location.id}
+                >
+                  {location.name}
+                </option>
+              ),
+            )}
+
+          </select>
+
+
+          {!showNewLocation ? (
+
+            <button
+              type="button"
+              onClick={() =>
+                setShowNewLocation(true)
+              }
+            >
+              ＋ 新增地點
+            </button>
+
+          ) : (
+
+            <div
+              style={{
+                display: "flex",
+                gap: "8px",
+                marginTop: "8px",
+              }}
+            >
+
+              <input
+                type="text"
+                value={newLocationName}
+                placeholder="輸入新地點名稱"
+                onChange={(event) =>
+                  setNewLocationName(
+                    event.target.value,
+                  )
+                }
+              />
+
+              <button
+                type="button"
+                onClick={
+                  handleCreateLocation
+                }
+              >
+                新增
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setNewLocationName("");
+                  setShowNewLocation(false);
+                }}
+              >
+                取消
+              </button>
+
+            </div>
+
+          )}
 
         </div>
 
@@ -411,21 +945,21 @@ function CreateEscapeRoom() {
 
         <div className="escape-room-field">
 
-          <label htmlFor="min_players">
+          <label htmlFor="min_people">
             最少人數
           </label>
 
           <input
-            id="min_players"
+            id="min_people"
             type="number"
             min="1"
             value={
-              form.min_players ??
+              form.min_people ??
               ""
             }
             onChange={(event) =>
               updateField(
-                "min_players",
+                "min_people",
                 event.target.value ===
                   ""
                   ? null
@@ -441,21 +975,21 @@ function CreateEscapeRoom() {
 
         <div className="escape-room-field">
 
-          <label htmlFor="max_players">
+          <label htmlFor="max_people">
             最多人數
           </label>
 
           <input
-            id="max_players"
+            id="max_people"
             type="number"
             min="1"
             value={
-              form.max_players ??
+              form.max_people ??
               ""
             }
             onChange={(event) =>
               updateField(
-                "max_players",
+                "max_people",
                 event.target.value ===
                   ""
                   ? null

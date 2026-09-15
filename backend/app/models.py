@@ -11,6 +11,8 @@ from sqlalchemy import (
     Uuid,
     func,
 )
+from sqlalchemy.dialects.postgresql import JSONB
+
 from sqlalchemy.orm import (
     Mapped,
     mapped_column,
@@ -18,6 +20,56 @@ from sqlalchemy.orm import (
 )
 
 from .database import Base
+
+
+# ========================================
+# Studio
+# ========================================
+
+class Studio(Base):
+    __tablename__ = "studios"
+
+    id: Mapped[int] = mapped_column(
+        BigInteger,
+        primary_key=True,
+    )
+
+    name: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+        unique=True,
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+    )
+
+
+# ========================================
+# Location
+# ========================================
+
+class Location(Base):
+    __tablename__ = "locations"
+
+    id: Mapped[int] = mapped_column(
+        BigInteger,
+        primary_key=True,
+    )
+
+    name: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+        unique=True,
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+    )
 
 
 # ========================================
@@ -37,18 +89,38 @@ class EscapeRoom(Base):
         nullable=False,
     )
 
-    studio: Mapped[str | None] = mapped_column(
-        Text,
+    # 工作室
+    studio_id: Mapped[int | None] = mapped_column(
+        BigInteger,
+        ForeignKey(
+            "studios.id",
+            ondelete="SET NULL",
+        ),
         nullable=True,
     )
 
-    dates: Mapped[str | None] = mapped_column(
-        Text,
-        nullable=True,
+    # 一個密室可以有多個日期
+    #
+    # 例如：
+    #
+    # [
+    #     "2026-09-20",
+    #     "2026-10-03",
+    #     "2026-10-17"
+    # ]
+    dates: Mapped[list[str]] = mapped_column(
+        JSONB,
+        nullable=False,
+        default=list,
     )
 
-    location: Mapped[str | None] = mapped_column(
-        Text,
+    # 地點
+    location_id: Mapped[int | None] = mapped_column(
+        BigInteger,
+        ForeignKey(
+            "locations.id",
+            ondelete="SET NULL",
+        ),
         nullable=True,
     )
 
