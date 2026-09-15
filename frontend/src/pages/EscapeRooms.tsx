@@ -173,12 +173,14 @@ function EscapeRooms() {
       rooms
         .map(
           (room) =>
-            room.company,
+            room.studio_name,
         )
         .filter(
-          (company) =>
-            company &&
-            company.trim() !== "",
+          (
+            studio,
+          ): studio is string =>
+            studio !== null &&
+            studio.trim() !== "",
         ),
     );
 
@@ -201,7 +203,7 @@ function EscapeRooms() {
 
     return rooms.filter(
       (room) =>
-        room.company ===
+        room.studio_name ===
         selectedStudio,
     );
   }, [

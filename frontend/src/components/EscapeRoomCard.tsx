@@ -246,28 +246,29 @@ function EscapeRoomCard({
 
           <p>
             <span>工作室</span>
-            {room.company ||
+            {room.studio_name ||
               "未記錄"}
           </p>
 
           <p>
             <span>遊玩日期</span>
-            {room.date ||
-              "未記錄"}
+            {room.dates?.length
+              ? room.dates.join("、")
+              : "未記錄"}
           </p>
 
           <p>
             <span>地點</span>
-            {room.location ||
+            {room.location_name ||
               "未記錄"}
           </p>
 
           <p>
             <span>遊玩人數</span>
-            {room.min_players ??
+            {room.min_people ??
               "?"}
             {" ～ "}
-            {room.max_players ??
+            {room.max_people ??
               "?"}
             {" 人"}
           </p>
