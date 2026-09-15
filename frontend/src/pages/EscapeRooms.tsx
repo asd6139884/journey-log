@@ -179,7 +179,7 @@ function EscapeRooms() {
           (
             studio,
           ): studio is string =>
-            studio !== null &&
+            typeof studio === "string" &&
             studio.trim() !== "",
         ),
     );
