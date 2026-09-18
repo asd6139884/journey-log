@@ -22,6 +22,7 @@
    ======================================== */
 
 .navbar-inner {
+  width: 100%;
   max-width: 1200px;
   min-height: 68px;
 
@@ -30,7 +31,10 @@
 
   display: flex;
   align-items: center;
+
   gap: 32px;
+
+  box-sizing: border-box;
 }
 
 
@@ -41,6 +45,7 @@
 .navbar-brand {
   display: flex;
   align-items: center;
+
   gap: 9px;
 
   flex-shrink: 0;
@@ -50,6 +55,7 @@
 
   font-size: 20px;
   font-weight: 800;
+
   letter-spacing: -0.5px;
 
   transition:
@@ -59,8 +65,12 @@
 
 .navbar-brand:hover {
   opacity: 0.8;
+
   transform: translateY(-1px);
 }
+
+
+/* Logo Icon */
 
 .navbar-brand-icon {
   display: flex;
@@ -70,12 +80,17 @@
   width: 34px;
   height: 34px;
 
+  flex-shrink: 0;
+
   border-radius: 10px;
 
   background: #111827;
 
   font-size: 18px;
 }
+
+
+/* Logo Text */
 
 .navbar-brand-text {
   white-space: nowrap;
@@ -89,16 +104,23 @@
 .navbar-links {
   display: flex;
   align-items: center;
+
   gap: 4px;
 
   flex: 1;
+
+  min-width: 0;
 }
+
+
+/* Individual Link */
 
 .navbar-link {
   position: relative;
 
   display: flex;
   align-items: center;
+
   gap: 6px;
 
   padding: 9px 13px;
@@ -106,29 +128,41 @@
   border-radius: 9px;
 
   color: #6b7280;
+
   text-decoration: none;
 
   font-size: 15px;
   font-weight: 500;
+
+  white-space: nowrap;
 
   transition:
     color 0.2s ease,
     background-color 0.2s ease;
 }
 
+
+/* Hover */
+
 .navbar-link:hover {
   color: #111827;
+
   background: #f3f4f6;
 }
 
+
+/* Active */
+
 .navbar-link.active {
   color: #111827;
+
   background: #f3f4f6;
+
   font-weight: 650;
 }
 
 
-/* Active indicator */
+/* Active Indicator */
 
 .navbar-link.active::after {
   content: "";
@@ -156,6 +190,7 @@
 .navbar-auth {
   display: flex;
   align-items: center;
+
   gap: 12px;
 
   flex-shrink: 0;
@@ -169,23 +204,32 @@
 .navbar-user {
   display: flex;
   align-items: center;
+
   gap: 7px;
 
   color: #6b7280;
 
   font-size: 14px;
   font-weight: 500;
+
+  white-space: nowrap;
 }
+
+
+/* Green Dot */
 
 .navbar-user-dot {
   width: 7px;
   height: 7px;
 
+  flex-shrink: 0;
+
   border-radius: 50%;
 
   background: #22c55e;
 
-  box-shadow: 0 0 0 3px #dcfce7;
+  box-shadow:
+    0 0 0 3px #dcfce7;
 }
 
 
@@ -203,9 +247,12 @@
 
   padding: 0 16px;
 
+  box-sizing: border-box;
+
   border-radius: 9px;
 
   color: #ffffff;
+
   background: #111827;
 
   text-decoration: none;
@@ -213,11 +260,16 @@
   font-size: 14px;
   font-weight: 600;
 
+  white-space: nowrap;
+
   transition:
     background-color 0.2s ease,
     transform 0.2s ease,
     box-shadow 0.2s ease;
 }
+
+
+/* Login Hover */
 
 .navbar-login:hover {
   background: #374151;
@@ -243,15 +295,21 @@
 
   padding: 0 16px;
 
+  box-sizing: border-box;
+
   border: 1px solid #e5e7eb;
   border-radius: 9px;
 
   color: #374151;
+
   background: #ffffff;
 
   font-family: inherit;
+
   font-size: 14px;
   font-weight: 600;
+
+  white-space: nowrap;
 
   cursor: pointer;
 
@@ -262,13 +320,21 @@
     transform 0.2s ease;
 }
 
+
+/* Logout Hover */
+
 .navbar-logout:hover {
   color: #dc2626;
+
   background: #fef2f2;
+
   border-color: #fecaca;
 
   transform: translateY(-1px);
 }
+
+
+/* Logout Active */
 
 .navbar-logout:active {
   transform: translateY(0);
@@ -276,46 +342,178 @@
 
 
 /* ========================================
+   Tablet
+   769px ~ 1000px
+   ======================================== */
+
+@media (min-width: 769px) and (max-width: 1000px) {
+
+  .navbar-inner {
+    padding: 0 16px;
+
+    gap: 14px;
+  }
+
+
+  .navbar-brand {
+    font-size: 18px;
+  }
+
+
+  .navbar-brand-icon {
+    width: 32px;
+    height: 32px;
+
+    font-size: 17px;
+  }
+
+
+  .navbar-link {
+    padding: 8px 9px;
+
+    font-size: 14px;
+
+    gap: 5px;
+  }
+
+
+  .navbar-auth {
+    gap: 8px;
+  }
+
+
+  .navbar-user {
+    font-size: 13px;
+  }
+
+
+  .navbar-login,
+  .navbar-logout {
+    min-width: 66px;
+
+    height: 36px;
+
+    padding: 0 12px;
+
+    font-size: 13px;
+  }
+}
+
+
+/* ========================================
    Mobile
+   ≤ 768px
    ======================================== */
 
 @media (max-width: 768px) {
+
   .navbar-inner {
     min-height: auto;
 
-    padding: 12px 16px;
+    padding: 10px 16px;
+
+    display: flex;
 
     flex-wrap: wrap;
-    gap: 10px 16px;
+
+    gap: 8px 12px;
   }
+
+
+  /* ----------------------------------------
+     第一排：Logo
+     ---------------------------------------- */
 
   .navbar-brand {
     flex: 1;
+
+    min-width: 0;
   }
+
+
+  .navbar-brand-text {
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+  }
+
+
+  /* ----------------------------------------
+     第一排：登入 / 登出
+     ---------------------------------------- */
 
   .navbar-auth {
     order: 2;
+
+    margin-left: auto;
+
+    gap: 8px;
   }
+
+
+  /* ----------------------------------------
+     第二排：Navigation
+     ---------------------------------------- */
 
   .navbar-links {
     order: 3;
 
     width: 100%;
 
+    flex: none;
+
+    display: flex;
+    align-items: center;
+
+    gap: 4px;
+
     overflow-x: auto;
 
-    padding-bottom: 2px;
+    padding: 2px 0 3px;
 
     scrollbar-width: none;
+
+    -webkit-overflow-scrolling: touch;
   }
+
+
+  /* Chrome / Safari Scrollbar */
 
   .navbar-links::-webkit-scrollbar {
     display: none;
   }
 
+
+  /* ----------------------------------------
+     Mobile Navigation Link
+     ---------------------------------------- */
+
   .navbar-link {
     flex-shrink: 0;
+
+    padding: 8px 11px;
+
+    font-size: 14px;
+
+    gap: 5px;
   }
+
+
+  /* ----------------------------------------
+     Mobile Active Indicator
+     ---------------------------------------- */
+
+  .navbar-link.active::after {
+    bottom: 2px;
+
+    width: 4px;
+    height: 4px;
+  }
+
+
+  /* ----------------------------------------
+     Mobile User Status
+     ---------------------------------------- */
 
   .navbar-user {
     display: none;
@@ -325,31 +523,134 @@
 
 /* ========================================
    Small Mobile
+   ≤ 480px
    ======================================== */
 
 @media (max-width: 480px) {
-  .navbar-brand-text {
-    font-size: 18px;
+
+  .navbar-inner {
+    padding: 9px 12px;
+
+    gap: 7px 10px;
   }
+
+
+  /* ----------------------------------------
+     Logo
+     ---------------------------------------- */
+
+  .navbar-brand {
+    gap: 7px;
+  }
+
 
   .navbar-brand-icon {
     width: 31px;
     height: 31px;
 
+    border-radius: 9px;
+
     font-size: 16px;
   }
 
-  .navbar-link {
-    padding: 8px 10px;
 
-    font-size: 14px;
+  .navbar-brand-text {
+    font-size: 17px;
   }
+
+
+  /* ----------------------------------------
+     Login / Logout
+     ---------------------------------------- */
 
   .navbar-login,
   .navbar-logout {
     min-width: 64px;
-    height: 36px;
 
-    padding: 0 13px;
+    height: 35px;
+
+    padding: 0 12px;
+
+    border-radius: 8px;
+
+    font-size: 13px;
+  }
+
+
+  /* ----------------------------------------
+     Navigation
+     ---------------------------------------- */
+
+  .navbar-links {
+    gap: 3px;
+  }
+
+
+  .navbar-link {
+    padding: 8px 9px;
+
+    border-radius: 8px;
+
+    font-size: 13px;
+
+    gap: 4px;
+  }
+}
+
+
+/* ========================================
+   Very Small Mobile
+   ≤ 360px
+   ======================================== */
+
+@media (max-width: 360px) {
+
+  .navbar-inner {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+
+  /* ----------------------------------------
+     Logo
+     ---------------------------------------- */
+
+  .navbar-brand-text {
+    font-size: 16px;
+  }
+
+
+  .navbar-brand-icon {
+    width: 29px;
+    height: 29px;
+
+    font-size: 15px;
+  }
+
+
+  /* ----------------------------------------
+     Login / Logout
+     ---------------------------------------- */
+
+  .navbar-login,
+  .navbar-logout {
+    min-width: 58px;
+
+    height: 33px;
+
+    padding: 0 9px;
+
+    font-size: 12px;
+  }
+
+
+  /* ----------------------------------------
+     Navigation
+     ---------------------------------------- */
+
+  .navbar-link {
+    padding: 7px 8px;
+
+    font-size: 12px;
   }
 }
