@@ -12,6 +12,7 @@ load_dotenv()
 
 from app.routers import (
     auth,
+    admin,
     escape_rooms,
     studios,
     locations,
@@ -47,6 +48,7 @@ app.add_middleware(
 # =========================
 
 app.include_router(auth.router)
+app.include_router(admin.router)
 app.include_router(escape_rooms.router)
 app.include_router(studios.router)
 app.include_router(locations.router)

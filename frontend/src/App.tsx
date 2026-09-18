@@ -9,6 +9,7 @@ import Travels from "./pages/Travels";
 import CreateEscapeRoom from "./pages/CreateEscapeRoom";
 import EditEscapeRoom from "./pages/EditEscapeRoom";
 import Login from "./pages/Login";
+import Admin from "./pages/Admin";
 
 function App() {
   return (
@@ -28,6 +29,16 @@ function App() {
           <Route
             path="/login"
             element={<Login />}
+          />
+
+          {/* 後台 */}
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute permission="admin">
+                <Admin />
+              </ProtectedRoute>
+            }
           />
 
           {/* 密室逃脫：觀看 */}

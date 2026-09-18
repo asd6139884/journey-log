@@ -3,7 +3,11 @@ import { useAuth } from "../auth/AuthContext";
 import "./Navbar.css";
 
 function Navbar() {
-  const { user, logout } = useAuth();
+  const {
+    user,
+    logout,
+    hasPermission,
+  } = useAuth();
 
   async function handleLogout() {
     try {
@@ -67,6 +71,21 @@ function Navbar() {
             <span>✈️</span>
             旅遊
           </NavLink>
+
+          {/* 只有 admin 才顯示管理員選單 */}
+          {hasPermission("admin") && (
+            <NavLink
+              to="/admin"
+              className={({ isActive }) =>
+                `navbar-link ${
+                  isActive ? "active" : ""
+                }`
+              }
+            >
+              <span>⚙️</span>
+              管理員
+            </NavLink>
+          )}
         </nav>
 
         {/* 登入 / 登出 */}

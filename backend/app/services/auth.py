@@ -1,5 +1,5 @@
 import os
-
+from uuid import UUID
 import jwt
 from fastapi import HTTPException, status
 from jwt import PyJWKClient
@@ -118,6 +118,14 @@ def get_current_user(
             detail="Token 缺少使用者 ID",
         )
 
+    try:
+        user_uuid = UUID(user_id)
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token 使用者 ID 格式無效",
+        ) from exc
+
     # ------------------------------------
     # 查詢網站 users
     # ------------------------------------
@@ -125,7 +133,7 @@ def get_current_user(
     user = (
         db.query(User)
         .filter(
-            User.id == user_id
+            User.id == user_uuid
         )
         .first()
     )
@@ -138,7 +146,7 @@ def get_current_user(
         email = payload.get("email")
 
         user = User(
-            id=user_id,
+            id=user_uuid,
             email=email,
             username=email,
             display_name=email,
