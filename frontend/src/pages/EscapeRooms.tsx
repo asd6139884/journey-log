@@ -213,6 +213,46 @@ function EscapeRooms() {
 
 
   /* ==================================================
+     已有人遊玩的密室
+     
+     條件：
+     至少有一個人玩過
+     ================================================== */
+
+  const playedRooms = useMemo(() => {
+    return filteredRooms.filter(
+      (room) =>
+        PEOPLE.some(
+          (person) =>
+            room.participants?.[
+              person
+            ] === true,
+        ),
+    );
+  }, [filteredRooms]);
+
+
+  /* ==================================================
+     尚未有人遊玩的密室
+     
+     條件：
+     所有人都沒有玩過
+     ================================================== */
+
+  const unplayedRooms = useMemo(() => {
+    return filteredRooms.filter(
+      (room) =>
+        !PEOPLE.some(
+          (person) =>
+            room.participants?.[
+              person
+            ] === true,
+        ),
+    );
+  }, [filteredRooms]);
+
+
+  /* ==================================================
      遊玩統計
      ================================================== */
 
@@ -243,11 +283,15 @@ function EscapeRooms() {
   if (loading) {
     return (
       <main className="escape-page">
-        <h1>密室逃脫</h1>
+
+        <h1>
+          密室逃脫
+        </h1>
 
         <div className="status-message">
           載入中...
         </div>
+
       </main>
     );
   }
@@ -260,11 +304,15 @@ function EscapeRooms() {
   if (error) {
     return (
       <main className="escape-page">
-        <h1>密室逃脫</h1>
+
+        <h1>
+          密室逃脫
+        </h1>
 
         <div className="error-message">
           {error}
         </div>
+
       </main>
     );
   }
@@ -277,18 +325,25 @@ function EscapeRooms() {
   return (
     <main className="escape-page">
 
+
       {/* ==================================================
           Header
           ================================================== */}
 
       <header className="escape-header">
+
         <div>
-          <h1>密室逃脫</h1>
+
+          <h1>
+            密室逃脫
+          </h1>
 
           <p>
             共 {filteredRooms.length} 間密室
           </p>
+
         </div>
+
       </header>
 
 
@@ -315,6 +370,7 @@ function EscapeRooms() {
           }
           className="studio-select"
         >
+
           <option value="全部">
             全部工作室
           </option>
@@ -329,6 +385,7 @@ function EscapeRooms() {
               </option>
             ),
           )}
+
         </select>
 
       </section>
@@ -343,14 +400,17 @@ function EscapeRooms() {
         <div className="section-title">
 
           <div>
-            <h2>遊玩統計</h2>
+
+            <h2>
+              遊玩統計
+            </h2>
 
             <p>
-              {selectedStudio ===
-              "全部"
+              {selectedStudio === "全部"
                 ? "全部工作室"
                 : selectedStudio}
             </p>
+
           </div>
 
           <div className="room-count">
@@ -366,6 +426,7 @@ function EscapeRooms() {
             width="100%"
             height="100%"
           >
+
             <BarChart
               data={playerStats}
               margin={{
@@ -450,6 +511,7 @@ function EscapeRooms() {
               />
 
             </BarChart>
+
           </ResponsiveContainer>
 
         </div>
@@ -458,120 +520,190 @@ function EscapeRooms() {
 
 
       {/* ==================================================
-          各主題遊玩紀錄
+          遊玩紀錄
           ================================================== */}
 
       <section className="records-section">
 
-        <div className="section-title">
 
-          <div>
-            <h2>
-              各主題遊玩紀錄
-            </h2>
+        {/* ==================================================
+            尚未遊玩密室
+            ================================================== */}
 
-            <p>
-              顯示每個人的遊玩紀錄
-            </p>
-          </div>
+        {unplayedRooms.length > 0 && (
 
-        </div>
+          <div className="unplayed-section">
 
+            <div className="section-title">
 
-        <div className="table-wrapper">
+              <div>
 
-          <table className="records-table">
+                <h2>
+                  尚未遊玩密室
+                </h2>
 
-            <thead>
-              <tr>
+                <p>
+                  目前沒有人玩過
+                </p>
 
-                <th className="room-name-column">
-                  密室名稱
-                </th>
+              </div>
 
-                {PEOPLE.map(
-                  (person) => (
-                    <th key={person}>
-                      {person}
-                    </th>
-                  ),
-                )}
+              <div className="room-count">
+                {unplayedRooms.length} 個主題
+              </div>
 
-              </tr>
-            </thead>
+            </div>
 
 
-            <tbody>
+            <div className="unplayed-list">
 
-              {filteredRooms.map(
+              {unplayedRooms.map(
                 (room) => (
-                  <tr key={room.id}>
-
-                    <td className="room-name-cell">
-                      {room.name}
-                    </td>
-
-                    {PEOPLE.map(
-                      (person) => {
-                        const played =
-                          room.participants?.[
-                            person
-                          ] === true;
-
-                        return (
-                          <td
-                            key={person}
-                            className={
-                              played
-                                ? "played-cell"
-                                : "not-played-cell"
-                            }
-                          >
-                            {played
-                              ? "✓"
-                              : "—"}
-                          </td>
-                        );
-                      },
-                    )}
-
-                  </tr>
+                  <div
+                    key={room.id}
+                    className="unplayed-item"
+                  >
+                    {room.name}
+                  </div>
                 ),
               )}
 
+            </div>
 
-              {filteredRooms.length ===
-                0 && (
+          </div>
+
+        )}
+
+
+        {/* ==================================================
+            已遊玩密室
+            ================================================== */}
+
+        <div className="played-section">
+
+          <div className="section-title">
+
+            <div>
+
+              <h2>
+                已遊玩密室
+              </h2>
+
+              <p>
+                至少有一人玩過的密室
+              </p>
+
+            </div>
+
+            <div className="room-count">
+              {playedRooms.length} 個主題
+            </div>
+
+          </div>
+
+
+          <div className="table-wrapper">
+
+            <table className="records-table">
+
+              <thead>
+
                 <tr>
 
-                  <td
-                    colSpan={
-                      PEOPLE.length + 1
-                    }
-                    className="empty-table"
-                  >
-                    此工作室目前沒有密室資料
-                  </td>
+                  <th className="room-name-column">
+                    密室名稱
+                  </th>
+
+                  {PEOPLE.map(
+                    (person) => (
+                      <th key={person}>
+                        {person}
+                      </th>
+                    ),
+                  )}
 
                 </tr>
-              )}
 
-            </tbody>
-
-          </table>
-
-        </div>
+              </thead>
 
 
-        <div className="table-hint">
-          ← 左右滑動查看完整紀錄 →
+              <tbody>
+
+                {playedRooms.map(
+                  (room) => (
+                    <tr key={room.id}>
+
+                      <td className="room-name-cell">
+                        {room.name}
+                      </td>
+
+                      {PEOPLE.map(
+                        (person) => {
+
+                          const played =
+                            room.participants?.[
+                              person
+                            ] === true;
+
+                          return (
+                            <td
+                              key={person}
+                              className={
+                                played
+                                  ? "played-cell"
+                                  : "not-played-cell"
+                              }
+                            >
+                              {played
+                                ? "✓"
+                                : "—"}
+                            </td>
+                          );
+                        },
+                      )}
+
+                    </tr>
+                  ),
+                )}
+
+
+                {playedRooms.length === 0 && (
+
+                  <tr>
+
+                    <td
+                      colSpan={
+                        PEOPLE.length + 1
+                      }
+                      className="empty-table"
+                    >
+                      目前沒有已遊玩的密室
+                    </td>
+
+                  </tr>
+
+                )}
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+
+          {playedRooms.length > 0 && (
+            <div className="table-hint">
+              ← 左右滑動查看完整紀錄 →
+            </div>
+          )}
+
         </div>
 
       </section>
 
 
       {/* ==================================================
-          密室列表
+          已遊玩密室列表
           ================================================== */}
 
       <section className="rooms-section">
@@ -579,11 +711,15 @@ function EscapeRooms() {
         <div className="section-title">
 
           <div>
-            <h2>密室列表</h2>
+
+            <h2>
+              已遊玩密室列表
+            </h2>
 
             <p>
-              共 {filteredRooms.length} 間
+              共 {playedRooms.length} 間
             </p>
+
           </div>
 
 
@@ -592,6 +728,7 @@ function EscapeRooms() {
               ================================== */}
 
           {canEdit && (
+
             <button
               type="button"
               onClick={() =>
@@ -602,22 +739,23 @@ function EscapeRooms() {
             >
               ＋ 新增密室
             </button>
+
           )}
 
         </div>
 
 
-        {filteredRooms.length === 0 ? (
+        {playedRooms.length === 0 ? (
 
           <div className="empty-message">
-            目前沒有密室資料
+            目前沒有已遊玩的密室
           </div>
 
         ) : (
 
           <div className="rooms-grid">
 
-            {filteredRooms.map(
+            {playedRooms.map(
               (room) => (
                 <EscapeRoomCard
                   key={room.id}
