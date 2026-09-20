@@ -3,10 +3,6 @@ import {
 } from "react";
 
 import {
-  useNavigate,
-} from "react-router-dom";
-
-import {
   useAuth,
 } from "../auth/AuthContext";
 
@@ -30,9 +26,6 @@ function EscapeRoomCard({
   room,
   onDelete,
 }: EscapeRoomCardProps) {
-  const navigate =
-    useNavigate();
-
   const {
     hasPermission,
   } = useAuth();
@@ -320,18 +313,19 @@ function EscapeRoomCard({
         {canEdit && (
           <div className="escape-card-actions">
 
-            <button
-              type="button"
-              onClick={() =>
-                navigate(
-                  `/escape-rooms/${room.id}/edit`,
-                )
-              }
-              className="edit-room-button"
-              disabled={deleting}
-            >
-              編輯
-            </button>
+          <button
+            type="button"
+            onClick={() =>
+              window.open(
+                `/escape-rooms/${room.id}/edit`,
+                "_blank",
+              )
+            }
+            className="edit-room-button"
+            disabled={deleting}
+          >
+            編輯
+          </button>
 
 
             <button

@@ -554,7 +554,6 @@ function EscapeRooms() {
 
             </div>
 
-
             <div className="unplayed-list">
 
               {unplayedRooms.map(
@@ -563,7 +562,15 @@ function EscapeRooms() {
                     key={room.id}
                     className="unplayed-item"
                   >
-                    {room.name}
+
+                    <div className="unplayed-room-name">
+                      {room.name}
+                    </div>
+
+                    <div className="unplayed-studio-name">
+                      {room.studio_name || "未設定工作室"}
+                    </div>
+
                   </div>
                 ),
               )}
@@ -732,8 +739,9 @@ function EscapeRooms() {
             <button
               type="button"
               onClick={() =>
-                navigate(
+                window.open(
                   "/escape-rooms/new",
+                  "_blank",
                 )
               }
             >

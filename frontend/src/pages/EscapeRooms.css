@@ -184,16 +184,43 @@
 }
 
 .unplayed-item {
-  padding: 9px 14px;
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 4px;
+
+  padding: 10px 14px;
+
   border: 1px solid #e3e3e3;
+
   border-radius: 8px;
+
   background: #f8f8f8;
+
   color: #444;
+
   font-size: 14px;
+
   line-height: 1.4;
+
   transition:
     background 0.15s ease,
     border-color 0.15s ease;
+}
+
+.unplayed-room-name {
+  font-size: 14px;
+
+  font-weight: 600;
+
+  color: #333;
+}
+
+.unplayed-studio-name {
+  font-size: 12px;
+
+  color: #888;
 }
 
 .unplayed-item:hover {
@@ -201,6 +228,15 @@
   background: #f1f1f1;
 }
 
+@media (max-width: 768px) {
+  .unplayed-room-name {
+    font-size: 13px;
+  }
+
+  .unplayed-studio-name {
+    font-size: 11px;
+  }
+}
 
 /* ==================================================
    已遊玩密室
