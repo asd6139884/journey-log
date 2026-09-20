@@ -4,8 +4,6 @@ import {
   useState,
 } from "react";
 
-import { useNavigate } from "react-router-dom";
-
 import {
   Bar,
   BarChart,
@@ -53,8 +51,6 @@ const PEOPLE = [
    ================================================== */
 
 function EscapeRooms() {
-  const navigate = useNavigate();
-
   const {
     hasPermission,
   } = useAuth();
