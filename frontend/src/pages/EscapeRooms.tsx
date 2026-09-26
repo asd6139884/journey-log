@@ -216,15 +216,59 @@ function EscapeRooms() {
      ================================================== */
 
   const playedRooms = useMemo(() => {
-    return filteredRooms.filter(
-      (room) =>
-        PEOPLE.some(
-          (person) =>
-            room.participants?.[
-              person
-            ] === true,
+    const getLatestPlayDate = (
+      room: EscapeRoom,
+    ): number | null => {
+      const dates = room.dates ?? [];
+
+      if (dates.length === 0) {
+        return null;
+      }
+
+      return Math.max(
+        ...dates.map(
+          (date) =>
+            new Date(date).getTime(),
         ),
-    );
+      );
+    };
+
+    return filteredRooms
+      .filter(
+        (room) =>
+          PEOPLE.some(
+            (person) =>
+              room.participants?.[person] === true,
+          ),
+      )
+      .sort((a, b) => {
+        const aLatest =
+          getLatestPlayDate(a);
+
+        const bLatest =
+          getLatestPlayDate(b);
+
+        // 都沒日期
+        if (
+          aLatest === null &&
+          bLatest === null
+        ) {
+          return 0;
+        }
+
+        // A沒日期 → 排後面
+        if (aLatest === null) {
+          return 1;
+        }
+
+        // B沒日期 → 排後面
+        if (bLatest === null) {
+          return -1;
+        }
+
+        // 最新日期排前面
+        return bLatest - aLatest;
+      });
   }, [filteredRooms]);
 
 
