@@ -10,6 +10,7 @@ import {
 import {
   createEscapeRoom,
   uploadEscapeRoomImage,
+  getEscapeRooms,
 } from "../api/escapeRooms";
 
 import {
@@ -23,6 +24,7 @@ import {
 } from "../api/locations";
 
 import type {
+  EscapeRoom,
   EscapeRoomInput,
   Participants,
   Studio,
@@ -86,7 +88,9 @@ function CreateEscapeRoom() {
    */
   const [studios, setStudios] =
     useState<Studio[]>([]);
-
+  
+  const [escapeRooms, setEscapeRooms] =
+    useState<EscapeRoom[]>([]);
 
   /*
    * 地點列表
@@ -160,13 +164,16 @@ function CreateEscapeRoom() {
         const [
           studioData,
           locationData,
+          escapeRoomData,
         ] = await Promise.all([
           getStudios(),
           getLocations(),
+          getEscapeRooms(),
         ]);
 
         setStudios(studioData);
         setLocations(locationData);
+        setEscapeRooms(escapeRoomData);
 
       } catch (err) {
         if (
@@ -228,7 +235,39 @@ function CreateEscapeRoom() {
     );
   }
 
+  const normalizedRoomName =
+    form.name
+      .trim()
+      .toLowerCase();
 
+
+  const duplicateEscapeRoom =
+    normalizedRoomName
+      ? escapeRooms.find(
+          (room) =>
+            room.name
+              .trim()
+              .toLowerCase() ===
+            normalizedRoomName,
+        )
+      : undefined;
+
+
+  const similarEscapeRooms =
+    normalizedRoomName
+      ? escapeRooms.filter(
+          (room) =>
+            room.name
+              .trim()
+              .toLowerCase()
+              .includes(
+                normalizedRoomName,
+              ) &&
+            room.id !==
+              duplicateEscapeRoom?.id,
+        )
+      : [];
+      
   /* ==================================================
      新增日期
      ================================================== */
@@ -516,6 +555,13 @@ function CreateEscapeRoom() {
       return;
     }
 
+    if (duplicateEscapeRoom) {
+      setError(
+        `密室「${duplicateEscapeRoom.name}」已經存在`,
+      );
+
+      return;
+    }
 
     if (
       form.min_people !==
@@ -630,6 +676,39 @@ function CreateEscapeRoom() {
               )
             }
           />
+
+          {/* 完全相同 */}
+          {duplicateEscapeRoom && (
+            <div className="escape-room-name-duplicate">
+              ⚠️ 已存在相同名稱的密室：
+
+              <strong>
+                {duplicateEscapeRoom.name}
+              </strong>
+            </div>
+          )}
+
+          {/* 類似名稱 */}
+          {!duplicateEscapeRoom &&
+            similarEscapeRooms.length > 0 && (
+              <div className="escape-room-name-suggestions">
+
+                <p>
+                  可能已存在相似的密室：
+                </p>
+
+                <ul>
+                  {similarEscapeRooms
+                    .slice(0, 5)
+                    .map((room) => (
+                      <li key={room.id}>
+                        {room.name}
+                      </li>
+                    ))}
+                </ul>
+
+              </div>
+            )}
 
         </div>
 
@@ -1208,7 +1287,10 @@ function CreateEscapeRoom() {
 
           <button
             type="submit"
-            disabled={saving}
+            disabled={
+              saving ||
+              Boolean(duplicateEscapeRoom)
+            }
           >
             {saving
               ? "建立中..."

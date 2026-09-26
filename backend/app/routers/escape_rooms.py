@@ -10,6 +10,7 @@ from fastapi import (
     UploadFile,
 )
 from PIL import Image
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -95,12 +96,57 @@ def create_escape_room(
         )
     ),
 ):
+    # ========================================
+    # Validate name
+    # ========================================
+
+    normalized_name = data.name.strip()
+
+    if not normalized_name:
+        raise HTTPException(
+            status_code=400,
+            detail="Escape room name cannot be empty",
+        )
+
+    # ========================================
+    # Check duplicate name
+    # ========================================
+
+    existing_room = (
+        db.query(EscapeRoomModel)
+        .filter(
+            func.lower(
+                EscapeRoomModel.name
+            )
+            == normalized_name.lower()
+        )
+        .first()
+    )
+
+    if existing_room is not None:
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                f"Escape room already exists: "
+                f"{existing_room.name}"
+            ),
+        )
+
+    # ========================================
+    # Create room
+    # ========================================
+
     room = EscapeRoomModel(
-        name=data.name,
+        name=normalized_name,
+
         studio_id=data.studio_id,
+
         dates=data.dates,
+
         location_id=data.location_id,
+
         min_people=data.min_people,
+
         max_people=data.max_people,
 
         chih_yi=data.participants.get(
