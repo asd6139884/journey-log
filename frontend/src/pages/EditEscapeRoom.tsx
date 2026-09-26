@@ -11,6 +11,7 @@ import {
 import {
   deleteEscapeRoomImage,
   getEscapeRoom,
+  getEscapeRooms,
   updateEscapeRoom,
   uploadEscapeRoomImage,
 } from "../api/escapeRooms";
@@ -68,6 +69,16 @@ function EditEscapeRoom() {
     useState<EscapeRoom | null>(
       null,
     );
+
+
+  /*
+   * 所有密室列表。
+   *
+   * 用來檢查編輯後的密室名稱是否
+   * 與其他密室重複或相似。
+   */
+  const [escapeRooms, setEscapeRooms] =
+    useState<EscapeRoom[]>([]);
 
 
   /*
@@ -145,7 +156,7 @@ function EditEscapeRoom() {
 
 
   /* ==================================================
-     取得工作室 / 地點
+     取得工作室 / 地點 / 密室列表
      ================================================== */
 
   useEffect(() => {
@@ -154,13 +165,21 @@ function EditEscapeRoom() {
         const [
           studioData,
           locationData,
+          escapeRoomData,
         ] = await Promise.all([
           getStudios(),
           getLocations(),
+          getEscapeRooms(),
         ]);
 
+
         setStudios(studioData);
+
         setLocations(locationData);
+
+        setEscapeRooms(
+          escapeRoomData,
+        );
 
       } catch (err) {
         if (
@@ -171,7 +190,7 @@ function EditEscapeRoom() {
           );
         } else {
           setError(
-            "取得工作室與地點列表失敗",
+            "取得工作室、地點與密室列表失敗",
           );
         }
       }
@@ -253,6 +272,84 @@ function EditEscapeRoom() {
     loadRoom();
 
   }, [id]);
+
+
+  /* ==================================================
+     密室名稱檢查
+     ================================================== */
+
+  /*
+   * 將目前輸入的名稱標準化。
+   *
+   * trim()
+   * → 移除前後空白
+   *
+   * toLowerCase()
+   * → 英文字母大小寫視為相同
+   */
+  const normalizedRoomName =
+    room?.name
+      .trim()
+      .toLowerCase() ?? "";
+
+
+  /*
+   * 完全相同的密室名稱。
+   *
+   * 注意：
+   * 必須排除目前正在編輯的密室自己。
+   *
+   * 例如：
+   *
+   * id = 1
+   * 名稱 = 哈梅爾寺
+   *
+   * 自己本身不算重複。
+   */
+  const duplicateEscapeRoom =
+    normalizedRoomName
+      ? escapeRooms.find(
+          (escapeRoom) =>
+            escapeRoom.id !==
+              room?.id &&
+            escapeRoom.name
+              .trim()
+              .toLowerCase() ===
+              normalizedRoomName,
+        )
+      : undefined;
+
+
+  /*
+   * 可能相似的密室名稱。
+   *
+   * 同樣需要排除目前正在編輯的密室自己。
+   *
+   * 例如：
+   *
+   * 目前：
+   * 哈梅爾
+   *
+   * 其他：
+   * 哈梅爾寺
+   * 哈梅爾寺：最終章
+   *
+   * 就會顯示在相似名稱提示。
+   */
+  const similarEscapeRooms =
+    normalizedRoomName
+      ? escapeRooms.filter(
+          (escapeRoom) =>
+            escapeRoom.id !==
+              room?.id &&
+            escapeRoom.name
+              .trim()
+              .toLowerCase()
+              .includes(
+                normalizedRoomName,
+              ),
+        )
+      : [];
 
 
   /* ==================================================
@@ -412,6 +509,7 @@ function EditEscapeRoom() {
             return currentRoom;
           }
 
+
           return {
             ...currentRoom,
             studio_id: studio.id,
@@ -482,6 +580,7 @@ function EditEscapeRoom() {
           if (!currentRoom) {
             return currentRoom;
           }
+
 
           return {
             ...currentRoom,
@@ -701,6 +800,9 @@ function EditEscapeRoom() {
     }
 
 
+    /*
+     * 檢查密室名稱是否為空。
+     */
     if (
       !room.name.trim()
     ) {
@@ -712,6 +814,25 @@ function EditEscapeRoom() {
     }
 
 
+    /*
+     * 檢查是否存在其他相同名稱的密室。
+     *
+     * 目前正在編輯的密室自己
+     * 已經在 duplicateEscapeRoom
+     * 中排除了。
+     */
+    if (duplicateEscapeRoom) {
+      setError(
+        `密室「${duplicateEscapeRoom.name}」已經存在`,
+      );
+
+      return;
+    }
+
+
+    /*
+     * 檢查最少 / 最多人數。
+     */
     if (
       room.min_people !==
         null &&
@@ -735,7 +856,8 @@ function EditEscapeRoom() {
 
       const data:
         EscapeRoomInput = {
-        name: room.name,
+        name:
+          room.name,
 
         studio_id:
           room.studio_id,
@@ -878,6 +1000,63 @@ function EditEscapeRoom() {
               )
             }
           />
+
+
+          {/* =========================
+              完全相同
+          ========================= */}
+
+          {duplicateEscapeRoom && (
+            <div className="escape-room-name-duplicate">
+
+              ⚠️ 已存在相同名稱的密室：
+
+              <strong>
+                {
+                  duplicateEscapeRoom.name
+                }
+              </strong>
+
+            </div>
+          )}
+
+
+          {/* =========================
+              類似名稱
+          ========================= */}
+
+          {!duplicateEscapeRoom &&
+            similarEscapeRooms.length >
+              0 && (
+              <div className="escape-room-name-suggestions">
+
+                <p>
+                  可能已存在相似的密室：
+                </p>
+
+
+                <ul>
+                  {similarEscapeRooms
+                    .slice(0, 5)
+                    .map(
+                      (
+                        escapeRoom,
+                      ) => (
+                        <li
+                          key={
+                            escapeRoom.id
+                          }
+                        >
+                          {
+                            escapeRoom.name
+                          }
+                        </li>
+                      ),
+                    )}
+                </ul>
+
+              </div>
+            )}
 
         </div>
 
@@ -1642,7 +1821,10 @@ function EditEscapeRoom() {
               saving ||
               uploading ||
               deletingImageId !==
-                null
+                null ||
+              Boolean(
+                duplicateEscapeRoom,
+              )
             }
           >
             {saving
